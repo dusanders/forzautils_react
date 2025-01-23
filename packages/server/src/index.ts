@@ -24,6 +24,7 @@ class Server {
 const server = new Server({
   port: 80,
   wsPort: 81,
-  wwwRoot: '../frontend/dist'
+  wwwRoot: '../frontend/dist',
+  forzaListeningPort: 5200
 });
 server.start();

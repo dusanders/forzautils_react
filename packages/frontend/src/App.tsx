@@ -2,21 +2,16 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { ForzaWebsocket } from '@forzautils_react/core';
 
 function App() {
   const [count, setCount] = useState(0);
   console.log(`loading WS`);
-  const ws = new WebSocket('ws://127.0.0.1:81/connect');
-  ws.onopen = (ev) => {
-    console.log(`ws open`);
-    ws.send(JSON.stringify({"type": "world"}))
-  }
-  ws.addEventListener('error', (ev) => {
-    console.log(`error: ${ev}`, ev);
+  const ws = new ForzaWebsocket();
+  ws.on('open', () => {
+    console.log(`Forza socket open`);
   });
-  ws.onclose = (ev) => {
-    console.log(`closed ${ev.code} ${ev.reason}`);
-  }
+  ws.start();
   return (
     <>
       <div>
