@@ -1,0 +1,14 @@
+{
+  "name": "@forzautils_react/core",
+  "version": "1.0.0",
+  "description": "Core support package",
+  "main": "./dist/core/src/index.js",
+  "license": "none",
+  "private": true,
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "axios": "^1.7.9"
+  }
+}

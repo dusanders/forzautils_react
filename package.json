@@ -1,0 +1,20 @@
+{
+  "name": "forzautils_react",
+  "version": "1.0.0",
+  "description": "Forza utils for web browsers using React",
+  "repository": "https://github.com/dusanders/forzautils_react.git",
+  "author": "dusanders <dusanders@gmail.com>",
+  "license": "none",
+  "private": true,
+  "workspaces":[
+    "packages/*"
+  ],
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "scripts": {
+    "build": "yarn workspaces run build",
+    "start": "yarn workspace @forzautils_react/server start",
+    "vite": "yarn workspace @forzautils_react/frontend dev"
+  }
+}
