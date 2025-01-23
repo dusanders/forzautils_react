@@ -1,12 +1,12 @@
 import { App, TemplatedApp } from "uWebSockets.js";
-import { IServerConfig } from "../types/ServerConfig";
-import { IServer } from "../types/Server";
-import { WebsocketHub } from "../sockets/WebsocketHub";
-import { UdpEventSubscription } from "../types/ForzaDataEmitter";
-import { ByteEncoder } from "../utilities/ByteEncoder";
-import { PublicSubscriptions } from "../types/Constants";
-import { WebsocketRoutes } from "@forzautils_react/core/dist/core/src/routes.js";
-import { IncomingUdpListener } from "../sockets/IncomingUdpSocket";
+import { IServerConfig } from "../types/ServerConfig.js";
+import { IServer } from "../types/Server.js";
+import { WebsocketHub } from "../sockets/WebsocketHub.js";
+import { UdpEventSubscription } from "../types/ForzaDataEmitter.js";
+import { ByteEncoder } from "../utilities/ByteEncoder.js";
+import { PublicSubscriptions } from "../types/Constants.js";
+import { IncomingUdpListener } from "../sockets/IncomingUdpSocket.js";
+import { WebsocketRoutes } from "@forzautils/core"
 
 export class WebsocketServer implements IServer {
   private config: IServerConfig;
@@ -46,7 +46,7 @@ export class WebsocketServer implements IServer {
     }
   }
 
-  private sendPacket(bytes: ArrayBuffer): void {
+  private sendPacket(bytes: Buffer<ArrayBufferLike>): void {
     this.wsApp.publish(
       ByteEncoder.encode(PublicSubscriptions.ForzaData),
       bytes,

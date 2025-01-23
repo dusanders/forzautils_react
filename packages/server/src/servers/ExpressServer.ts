@@ -1,6 +1,6 @@
 import express, { Application } from "express";
-import { IServerConfig } from "../types/ServerConfig";
-import { IServer } from "../types/Server";
+import { IServerConfig } from "../types/ServerConfig.js";
+import { IServer } from "../types/Server.js";
 import { Server } from "node:http";
 
 export class ExpressServer implements IServer {

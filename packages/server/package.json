@@ -1,25 +1,31 @@
 {
-  "name": "@forzautils_react/server",
+  "private": true,
+  "name": "@forzautils/server",
   "version": "1.0.0",
   "description": "Server in Node.js",
   "main": "./dist/server/src/index.js",
   "license": "none",
-  "private": true,
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "start": "npx nodemon --watch ./dist/server/src ./dist/server/src/index.js"
+    "build": "rm -rf ./dist && tsc",
+    "start": "npx nodemon --watch ./dist/ ./dist/index.js"
+  },
+  "workspaces": {
+    "nohoist": [
+      "**"
+    ]
   },
   "dependencies": {
-    "@forzautils_react/core": "*",
+    "@forzautils/core": "1.0.0",
     "express": "^4.21.2",
     "fs-extra": "^11.3.0",
-    "uWebSockets.js": "uNetworking/uWebSockets.js#v20.51.0",
-    "uwebsocket-serve": "^1.0.8"
+    "uWebSockets.js": "uNetworking/uWebSockets.js#v20.51.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.7",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "typescript": "^5.7.3"
   }
 }

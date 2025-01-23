@@ -1,5 +1,5 @@
-import { WebsocketRoutes } from "./routes";
-import { randomKey } from "./utils";
+import { WebsocketRoutes } from "./routes.js";
+import { randomKey } from "./utils.js";
 
 export interface ForzaDataEvent {
   buffer: ArrayBuffer;

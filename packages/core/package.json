@@ -1,16 +1,15 @@
 {
-  "name": "@forzautils_react/core",
-  "version": "1.0.0",
-  "description": "Core support package",
-  "main": "./dist/core/src/index.js",
-  "license": "none",
-  "type": "module",
   "private": true,
+  "name": "@forzautils/core",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "yarn clean && tsc",
+    "clean": "rm -rf ./dist"
   },
-  "dependencies": {
-    "axios": "^1.7.9"
-  },
-  "files": ["./dist/core/src/*"]
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
 }

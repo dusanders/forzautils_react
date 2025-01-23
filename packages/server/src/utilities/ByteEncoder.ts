@@ -23,7 +23,7 @@ export class ByteEncoder {
    * @param jsString String to encode
    * @returns 
    */
-  static encode(jsString: string): ArrayBuffer {
+  static encode(jsString: string): Uint8Array {
     return (new TextEncoder()).encode(jsString);
   }
 }

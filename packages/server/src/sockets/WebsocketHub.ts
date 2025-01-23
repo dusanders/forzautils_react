@@ -1,7 +1,7 @@
 import { DISABLED, HttpRequest, HttpResponse, us_socket_context_t, WebSocket, WebSocketBehavior } from "uWebSockets.js";
-import { IWebsocketInfo } from "../types/WebsocketInfo";
-import { PublicSubscriptions } from "../types/Constants";
-import { ByteEncoder } from "../utilities/ByteEncoder";
+import { IWebsocketInfo } from "../types/WebsocketInfo.js";
+import { PublicSubscriptions } from "../types/Constants.js";
+import { ByteEncoder } from "../utilities/ByteEncoder.js";
 
 export class WebsocketHub {
   behavior: WebSocketBehavior<IWebsocketInfo> = {

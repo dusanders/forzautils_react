@@ -4,7 +4,7 @@ import {
   UdpDataEventMap,
   UdpEventSubscription,
   ForzaDataEmitter
-} from '../types/ForzaDataEmitter';
+} from '../types/ForzaDataEmitter.js';
 
 export class IncomingUdpListener implements ISubscribeUdpEvents {
   private socket?: dgram.Socket;

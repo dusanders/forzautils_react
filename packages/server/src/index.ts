@@ -1,7 +1,7 @@
-import { IServerConfig } from './types/ServerConfig';
-import { ExpressServer } from './servers/ExpressServer';
-import { WebsocketServer } from './servers/WebsocketServer';
-import { IServer } from './types/Server';
+import { IServerConfig } from './types/ServerConfig.js';
+import { ExpressServer } from './servers/ExpressServer.js';
+import { WebsocketServer } from './servers/WebsocketServer.js';
+import { IServer } from './types/Server.js';
 
 class Server {
 
