@@ -2,24 +2,26 @@ import { App, TemplatedApp } from "uWebSockets.js";
 import { IServerConfig } from "../types/ServerConfig";
 import { IServer } from "../types/Server";
 import { WebsocketHub } from "../sockets/WebsocketHub";
-import { ForzaEventSubscription, IForzaDataEmitter } from "../types/ForzaDataEmitter";
+import { UdpEventSubscription } from "../types/ForzaDataEmitter";
 import { ByteEncoder } from "../utilities/ByteEncoder";
 import { PublicSubscriptions } from "../types/Constants";
 import { WebsocketRoutes } from "@forzautils_react/core/dist/core/src/routes.js";
-import { ForzaUdpListener } from "./ForzaUdpListener";
+import { IncomingUdpListener } from "../sockets/IncomingUdpSocket";
 
 export class WebsocketServer implements IServer {
   private config: IServerConfig;
   private wsApp: TemplatedApp;
   private hub: WebsocketHub;
-  private forzaUdp: ForzaUdpListener;
-  private forzaSubscription?: ForzaEventSubscription;
+  private forzaUdp: IncomingUdpListener;
+  private forzaSubscription?: UdpEventSubscription;
+
   constructor(config: IServerConfig) {
     this.config = config;
     this.wsApp = App();
     this.hub = new WebsocketHub();
-    this.forzaUdp = new ForzaUdpListener();
+    this.forzaUdp = new IncomingUdpListener();
   }
+
   start() {
     this.wsApp.ws(WebsocketRoutes.connect, this.hub.behavior);
     this.wsApp.listen(this.config.wsPort, (socket) => {
@@ -35,6 +37,7 @@ export class WebsocketServer implements IServer {
       this.forzaUdp.start(this.config.forzaListeningPort);
     });
   }
+
   stop() {
     this.wsApp.close();
     this.forzaUdp.stop();
@@ -42,6 +45,7 @@ export class WebsocketServer implements IServer {
       this.forzaSubscription.remove();
     }
   }
+
   private sendPacket(bytes: ArrayBuffer): void {
     this.wsApp.publish(
       ByteEncoder.encode(PublicSubscriptions.ForzaData),
@@ -49,6 +53,7 @@ export class WebsocketServer implements IServer {
       true
     );
   }
+  
   private handleForzaData(buffer: Buffer<ArrayBufferLike>) {
     this.sendPacket(buffer);
   }

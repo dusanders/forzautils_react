@@ -1,12 +1,12 @@
 import * as dgram from 'node:dgram';
 import {
-  ISubscribeForzaEvents,
-  ForzaDataEventMap,
-  ForzaEventSubscription,
+  ISubscribeUdpEvents,
+  UdpDataEventMap,
+  UdpEventSubscription,
   ForzaDataEmitter
 } from '../types/ForzaDataEmitter';
 
-export class ForzaUdpListener implements ISubscribeForzaEvents {
+export class IncomingUdpListener implements ISubscribeUdpEvents {
   private socket?: dgram.Socket;
   private emitter: ForzaDataEmitter = new ForzaDataEmitter();
 
@@ -24,9 +24,13 @@ export class ForzaUdpListener implements ISubscribeForzaEvents {
     }
   }
 
-  on<K extends keyof ForzaDataEventMap>(key: K, fn: (data: ForzaDataEventMap[K]) => void): ForzaEventSubscription {
+  on<K extends keyof UdpDataEventMap>(key: K, fn: (data: UdpDataEventMap[K]) => void): UdpEventSubscription {
     return this.emitter.on(key, fn);
   }
+
+  /**
+   * Debug method to send dummy packets, as if UDP had sent data
+   */
   DEBUG() {
     setInterval(() => {
       this.emitter.emit('packet', Buffer.from(JSON.stringify({"test":"debug"})));
@@ -35,7 +39,8 @@ export class ForzaUdpListener implements ISubscribeForzaEvents {
 
   private socketOpen() {
     console.log(`Socket did open`);
-    this.DEBUG();
+    // TODO - remove this debug
+    // this.DEBUG();
     this.socket?.on('message', this.onMessage.bind(this));
   }
 

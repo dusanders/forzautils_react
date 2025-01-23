@@ -21,6 +21,8 @@ class Server {
   }
 }
 
+// TODO - move config into file and read file
+//  here instead of magic strings
 const server = new Server({
   port: 80,
   wsPort: 81,
