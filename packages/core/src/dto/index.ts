@@ -1,0 +1,1 @@
+export { WifiInfoDto } from './wifiInfo.js';

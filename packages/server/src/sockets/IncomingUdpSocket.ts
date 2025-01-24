@@ -4,12 +4,12 @@ import {
   UdpDataEventMap,
   UdpEventSubscription,
   ForzaDataEmitter
-} from '../types/ForzaDataEmitter.js';
+} from '../types/ForzaUdpTypes.js';
 
 export class IncomingUdpListener implements ISubscribeUdpEvents {
   private socket?: dgram.Socket;
   private emitter: ForzaDataEmitter = new ForzaDataEmitter();
-
+  
   start(port: number) {
     const socket = dgram.createSocket('udp4');
     socket.once('error', this.bindError.bind(this))

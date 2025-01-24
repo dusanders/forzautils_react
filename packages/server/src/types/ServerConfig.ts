@@ -1,6 +1,11 @@
 export interface IServerConfig {
   port: number;
-  wsPort: number;
   wwwRoot: string;
-  forzaListeningPort: number;
 }
+
+export interface IWebsocketServerConfig {
+  wsPort: number;
+  forzaListenPort: number;
+}
+
+export type AppConfig = IServerConfig & IWebsocketServerConfig;

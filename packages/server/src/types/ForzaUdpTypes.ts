@@ -1,6 +1,14 @@
 import EventEmitter from "node:events";
 
 /**
+ * Define the class that controls the UDP socket listening to Forza
+ * data. May add ability to change port on-fly.
+ */
+export interface IConfigureUdpSocket {
+  currentPort: number;
+}
+
+/**
  * Subscription to an event. Convenience object that
  * exposes a simple remove() method to clean up listener.
  */

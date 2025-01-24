@@ -1,22 +1,30 @@
-import { IServerConfig } from './types/ServerConfig.js';
+import { AppConfig, IServerConfig } from './types/ServerConfig.js';
 import { ExpressServer } from './servers/ExpressServer.js';
 import { WebsocketServer } from './servers/WebsocketServer.js';
-import { IServer } from './types/Server.js';
+import { IServer, IWebsocketServer } from './types/Server.js';
+import { WifiInfoMiddleware } from './middleware/WifiInfo.middleware.js';
+import { IConfigureUdpSocket } from './types/ForzaUdpTypes.js';
+import { StaticMiddleware } from './middleware/Static.middleware.js';
 
 class Server {
 
   private expressServer: IServer;
-  private websocketServer: IServer;
-  private config: IServerConfig;
+  private websocketServer: IWebsocketServer;
+  private udpConfigurator: IConfigureUdpSocket;
+  private config: AppConfig;
 
-  constructor(config: IServerConfig) {
+  constructor(config: AppConfig) {
     this.config = config;
     this.expressServer = new ExpressServer(this.config);
     this.websocketServer = new WebsocketServer(this.config);
+    this.udpConfigurator = this.websocketServer.getForzaUdpSocketConfig()
   }
 
   start() {
-    this.expressServer.start();
+    this.expressServer.start([
+      new WifiInfoMiddleware(this.udpConfigurator),
+      new StaticMiddleware(this.config.wwwRoot)
+    ]);
     this.websocketServer.start();
   }
 }
@@ -27,6 +35,6 @@ const server = new Server({
   port: 80,
   wsPort: 81,
   wwwRoot: '../frontend/dist',
-  forzaListeningPort: 5200
+  forzaListenPort: 5200
 });
 server.start();

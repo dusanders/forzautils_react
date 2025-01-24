@@ -4,4 +4,5 @@ export enum WebsocketRoutes {
 }
 export enum HttpRoutes {
   baseUrl = '127.0.0.1',
+  wifiInfo = '/wifi-info'
 }

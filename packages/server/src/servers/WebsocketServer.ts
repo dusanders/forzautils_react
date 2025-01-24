@@ -1,25 +1,33 @@
 import { App, TemplatedApp } from "uWebSockets.js";
-import { IServerConfig } from "../types/ServerConfig.js";
-import { IServer } from "../types/Server.js";
+import { IWebsocketServerConfig } from "../types/ServerConfig.js";
+import { IWebsocketServer } from "../types/Server.js";
 import { WebsocketHub } from "../sockets/WebsocketHub.js";
-import { UdpEventSubscription } from "../types/ForzaDataEmitter.js";
+import { IConfigureUdpSocket, UdpEventSubscription } from "../types/ForzaUdpTypes.js";
 import { ByteEncoder } from "../utilities/ByteEncoder.js";
 import { PublicSubscriptions } from "../types/Constants.js";
 import { IncomingUdpListener } from "../sockets/IncomingUdpSocket.js";
 import { WebsocketRoutes } from "@forzautils/core"
 
-export class WebsocketServer implements IServer {
-  private config: IServerConfig;
+export class WebsocketServer implements IWebsocketServer {
+  private config: IWebsocketServerConfig;
   private wsApp: TemplatedApp;
   private hub: WebsocketHub;
   private forzaUdp: IncomingUdpListener;
   private forzaSubscription?: UdpEventSubscription;
+  private udpConfig: IConfigureUdpSocket = {
+    currentPort: 0
+  }
 
-  constructor(config: IServerConfig) {
+  constructor(config: IWebsocketServerConfig) {
     this.config = config;
     this.wsApp = App();
     this.hub = new WebsocketHub();
     this.forzaUdp = new IncomingUdpListener();
+    this.udpConfig.currentPort = config.forzaListenPort;
+  }
+
+  getForzaUdpSocketConfig(): IConfigureUdpSocket {
+    return this.udpConfig
   }
 
   start() {
@@ -34,7 +42,7 @@ export class WebsocketServer implements IServer {
         'packet',
         this.handleForzaData.bind(this)
       );
-      this.forzaUdp.start(this.config.forzaListeningPort);
+      this.forzaUdp.start(this.config.forzaListenPort);
     });
   }
 
