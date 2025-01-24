@@ -8,7 +8,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "baseUrl": "./src",
+    "rootDir": "src",
   },
   "include": ["src/**/*"]
 }

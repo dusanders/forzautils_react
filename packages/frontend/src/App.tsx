@@ -2,7 +2,7 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css';
-import { ForzaWebsocket, WifiInfoDto } from '@forzautils/core';
+import { ForzaWebsocket, WifiInfoDto, Api } from '@forzautils/core';
 import { useTheme } from './context/Theme';
 import { Text } from './components/Text';
 
@@ -15,10 +15,11 @@ function App() {
     console.log(`Forza socket open`);
   });
   ws.start();
-  const ip: WifiInfoDto = {
-    ip: '',
-    listenPort: 0
-  }
+  
+  const api = new Api();
+  api.wifiApi.getIpInfo().then((res) => {
+    console.log(`got response: ${res.data}`);
+  })
   return (
     <>
     

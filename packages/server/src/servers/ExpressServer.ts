@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import { IServerConfig } from "../types/ServerConfig.js";
 import { IServer } from "../types/Server.js";
 import { Server } from "node:http";
-import { IMiddleware } from "types/Middleware.js";
+import { IMiddleware } from "../types/Middleware.js";
 
 export class ExpressServer implements IServer {
   private config: IServerConfig;

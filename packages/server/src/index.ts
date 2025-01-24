@@ -1,10 +1,11 @@
-import { AppConfig, IServerConfig } from './types/ServerConfig.js';
+import { AppConfig } from './types/ServerConfig.js';
 import { ExpressServer } from './servers/ExpressServer.js';
 import { WebsocketServer } from './servers/WebsocketServer.js';
 import { IServer, IWebsocketServer } from './types/Server.js';
 import { WifiInfoMiddleware } from './middleware/WifiInfo.middleware.js';
 import { IConfigureUdpSocket } from './types/ForzaUdpTypes.js';
 import { StaticMiddleware } from './middleware/Static.middleware.js';
+import { CorsMiddleware } from './middleware/Cors.middleware.js';
 
 class Server {
 
@@ -22,6 +23,7 @@ class Server {
 
   start() {
     this.expressServer.start([
+      new CorsMiddleware(),
       new WifiInfoMiddleware(this.udpConfigurator),
       new StaticMiddleware(this.config.wwwRoot)
     ]);

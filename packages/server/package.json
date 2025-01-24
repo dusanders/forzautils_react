@@ -3,7 +3,7 @@
   "name": "@forzautils/server",
   "version": "1.0.0",
   "description": "Server in Node.js",
-  "main": "./dist/server/src/index.js",
+  "main": "./dist/index.js",
   "license": "none",
   "type": "module",
   "scripts": {
@@ -17,12 +17,14 @@
   },
   "dependencies": {
     "@forzautils/core": "1.0.0",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "fs-extra": "^11.3.0",
     "ip": "^2.0.1",
     "uWebSockets.js": "uNetworking/uWebSockets.js#v20.51.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/fs-extra": "^11.0.4",
     "@types/ip": "^1.1.3",

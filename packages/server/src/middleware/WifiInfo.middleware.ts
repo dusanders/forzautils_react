@@ -1,8 +1,9 @@
 import { HttpRoutes, WifiInfoDto } from "@forzautils/core";
 import { Application, NextFunction, Request, Response } from "express";
-import { IMiddleware } from "types/Middleware.js";
-import * as IP from 'ip';
-import { IConfigureUdpSocket } from "types/ForzaUdpTypes.js";
+import ip from 'ip';
+import { IConfigureUdpSocket } from "../types/ForzaUdpTypes.js";
+import { IMiddleware } from "../types/Middleware.js";
+const { address } = ip;
 
 export class WifiInfoMiddleware implements IMiddleware {
   private udpConfig: IConfigureUdpSocket;
@@ -17,12 +18,12 @@ export class WifiInfoMiddleware implements IMiddleware {
   }
 
   private getWifiInfo(req: Request, res: Response, next: NextFunction) {
-    const ip = IP.address() ;  
+    const ip = address('public', 'ipv4');
     const dto: WifiInfoDto = {
       ip: ip,
       listenPort: this.udpConfig.currentPort
     }
     res.json(dto);
     res.end();
-  } 
+  }
 }

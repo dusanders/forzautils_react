@@ -1,6 +1,6 @@
-import { WifiInfoDto } from "./dto";
+import { WifiInfoDto } from "./dto/wifiInfo.js";
 import * as axios from 'axios';
-import { HttpRoutes } from "./routes";
+import { HttpRoutes } from "./routes.js";
 
 function usingAxios(): axios.AxiosInstance {
   const api = axios.default.create();
@@ -35,7 +35,7 @@ export class Api implements IApi {
 class WifiApi implements IWifiApi {
   async getIpInfo(): Promise<ApiResponse<WifiInfoDto>> {
     const api = usingAxios();
-    const response = await api.get(HttpRoutes.wifiInfo);
+    const response = await api.get(`${HttpRoutes.baseUrl}${HttpRoutes.wifiInfo}`);
     if(response.status !== 200) {
       return this.returnErrorResponse(response);
     }

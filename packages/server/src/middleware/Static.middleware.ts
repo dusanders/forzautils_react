@@ -1,5 +1,5 @@
 import express, { Application } from "express";
-import { IMiddleware } from "types/Middleware.js";
+import { IMiddleware } from "../types/Middleware.js";
 
 export class StaticMiddleware implements IMiddleware {
   private wwwroot: string;
