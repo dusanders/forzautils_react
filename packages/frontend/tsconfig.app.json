@@ -23,8 +23,9 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+    "rootDir": "./src",
   },
   "include": [
-    "src"
+    "./src/**/*"
   ]
 }

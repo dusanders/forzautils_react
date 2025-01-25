@@ -1,8 +1,9 @@
+import { ForzaTelemetryApi } from "ForzaTelemetryApi";
 import { WebsocketRoutes } from "./routes.js";
 import { randomKey } from "./utils.js";
 
 export interface ForzaDataEvent {
-  buffer: ArrayBuffer;
+  data: ForzaTelemetryApi;
 }
 
 export interface ForzaSocketEvents {
@@ -26,6 +27,8 @@ export interface ForzaWebsocketEventEmitter {
   on<K extends keyof ForzaSocketEvents>(key: K, fn: (data: ForzaDataEvent) => void): ForzaEventSubscription;
 }
 
+//#region Helper Types
+
 class event_subscriber {
   id: string = randomKey();
   private fn: forza_event_cb;
@@ -43,11 +46,26 @@ type event_callback_collection = {
 
 type forza_event_cb = ((data: ForzaDataEvent) => void) | ((data: ForzaDataEvent | Event) => void);
 
+//#endregion
+
 export class ForzaWebsocket implements ForzaWebsocketEventEmitter {
+  private static singleton: ForzaWebsocket;
+  static Open(): ForzaWebsocket {
+    if(!ForzaWebsocket.singleton) {
+      ForzaWebsocket.singleton = new ForzaWebsocket();
+    }
+    return ForzaWebsocket.singleton;
+  }
+
   private callbacks: event_callback_collection = {
     'close': [],
     'data': [],
     'open': []
+  }
+  private ws?: WebSocket;
+
+  private constructor() { 
+    // Disallow - use factory method!
   }
 
   private emit<K extends keyof ForzaSocketEvents>(key: K, arg: ForzaSocketEvents[K]): void {
@@ -63,16 +81,23 @@ export class ForzaWebsocket implements ForzaWebsocketEventEmitter {
   }
 
   start() {
-    const ws = new WebSocket(`ws://${WebsocketRoutes.baseUrl}${WebsocketRoutes.connect}`);
-    ws.onopen = (ev) => {
-      ws.send(JSON.stringify({ "type": "from React" }));
+    if(!this.ws) {
+      this.ws = new WebSocket(`${WebsocketRoutes.baseUrl}${WebsocketRoutes.connect}`);
+    }
+    this.ws.binaryType = 'arraybuffer';
+    this.ws.onopen = (ev) => {
+      this.ws?.send(JSON.stringify({ "type": "from React" }));
       this.emit('open', ev);
     }
-    ws.onclose = (ev) => {
+    this.ws.onclose = (ev) => {
       this.emit('close', ev);
     }
-    ws.onmessage = (ev) => {
-      this.emit('data', { buffer: ev.data });
+    this.ws.onmessage = (ev: MessageEvent<ArrayBuffer>) => {
+      this.emit('data', { data: new ForzaTelemetryApi(ev.data.byteLength, ev.data) });
     }
+  }
+
+  stop() {
+    this.ws?.close();
   }
 }

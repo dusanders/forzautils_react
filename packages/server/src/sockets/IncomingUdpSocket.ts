@@ -9,11 +9,14 @@ import {
 export class IncomingUdpListener implements ISubscribeUdpEvents {
   private socket?: dgram.Socket;
   private emitter: ForzaDataEmitter = new ForzaDataEmitter();
+  private port: number = 0;
   
   start(port: number) {
+    this.port = port;
     const socket = dgram.createSocket('udp4');
     socket.once('error', this.bindError.bind(this))
       .once('listening', this.socketOpen.bind(this))
+      .on('message', (buff, rinfo) => this.onMessage(buff, rinfo))
       .once('close', this.onClose.bind(this));
     socket.bind(port);
   }
@@ -38,10 +41,9 @@ export class IncomingUdpListener implements ISubscribeUdpEvents {
   }
 
   private socketOpen() {
-    console.log(`Socket did open`);
+    console.log(`Socket did open ${this.port}`);
     // TODO - remove this debug
     // this.DEBUG();
-    this.socket?.on('message', this.onMessage.bind(this));
   }
 
   private onMessage(buffer: Buffer<ArrayBufferLike>, rinfo: dgram.RemoteInfo) {

@@ -38,11 +38,7 @@ export class WebsocketServer implements IWebsocketServer {
         process.exit(1)
       }
       console.log(`Websocket server listening on ${this.config.wsPort}`);
-      this.forzaSubscription = this.forzaUdp.on(
-        'packet',
-        this.handleForzaData.bind(this)
-      );
-      this.forzaUdp.start(this.config.forzaListenPort);
+      this.setupFozaUdp();
     });
   }
 
@@ -54,15 +50,19 @@ export class WebsocketServer implements IWebsocketServer {
     }
   }
 
+  private setupFozaUdp() {
+    this.forzaSubscription = this.forzaUdp.on('packet', (data) => {
+      console.log(`packet event: ${data.byteLength}`);
+      this.sendPacket(data);
+    })
+    this.forzaUdp.start(this.config.forzaListenPort);
+  }
+
   private sendPacket(bytes: Buffer<ArrayBufferLike>): void {
     this.wsApp.publish(
-      ByteEncoder.encode(PublicSubscriptions.ForzaData),
+      PublicSubscriptions.ForzaData,
       bytes,
       true
     );
-  }
-  
-  private handleForzaData(buffer: Buffer<ArrayBufferLike>) {
-    this.sendPacket(buffer);
   }
 }

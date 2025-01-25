@@ -1,28 +1,31 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css';
-import { ForzaWebsocket, WifiInfoDto, Api } from '@forzautils/core';
 import { useTheme } from './context/Theme';
 import { Text } from './components/Text';
+import { Header } from './components/Header';
+import { useForzaData } from './hooks/useForzaData';
+import { Paper } from './components/Paper';
 
 function App() {
   const theme = useTheme();
   const [count, setCount] = useState(0);
-  console.log(`loading WS`);
-  const ws = new ForzaWebsocket();
-  ws.on('open', () => {
-    console.log(`Forza socket open`);
-  });
-  ws.start();
-  
-  const api = new Api();
-  api.wifiApi.getIpInfo().then((res) => {
-    console.log(`got response: ${res.data}`);
-  })
+  const forza = useForzaData();
+  useEffect(() => {
+    console.log(`new packet: ${forza.packet?.data.rpmData.current}`);
+  }, [forza.packet]);
   return (
     <>
-    
+      <Header />
+      <Paper>
+        <Text>
+          Test
+        </Text>
+        <Text variant={'secondary'} onVariant={'onSecondaryBg'}>
+          World
+        </Text>
+      </Paper>
       <div className={`flex justify-center rounded-lg ${theme.colors.background.secondary}`}>
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />

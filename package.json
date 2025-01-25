@@ -8,7 +8,8 @@
   "license": "none",
   "workspaces": {
     "packages": [
-      "packages/*"
+      "packages/*",
+      "../ForzaTelemetryAPI_typescript"
     ]
   },
   "scripts": {

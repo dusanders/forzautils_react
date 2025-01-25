@@ -6,11 +6,10 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "./dist",
-    "strict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "rootDir": "src"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["*/**/node_modules", "dist"]
 }

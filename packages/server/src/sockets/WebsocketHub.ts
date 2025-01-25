@@ -18,10 +18,13 @@ export class WebsocketHub {
 
   private open(ws: WebSocket<IWebsocketInfo>) {
     console.log(`websocket.open()`);
-    ws.subscribe(ByteEncoder.encode(PublicSubscriptions.ForzaData));
-    ws.send(ByteEncoder.encode(
-      JSON.stringify({ "type": "hello" })
-    ));
+    ws.subscribe(PublicSubscriptions.ForzaData);
+    ws.send(
+      Buffer.from(
+        JSON.stringify({ "type": "hello" })
+      ),
+      true
+    );
   }
 
   private drain(ws: WebSocket<IWebsocketInfo>) {

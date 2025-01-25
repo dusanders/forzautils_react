@@ -27,8 +27,8 @@ const themecolors: IColorElements = {
       onSecondaryBg: "text-blue-600 dark:text-sky-400"
     },
     secondary: {
-      onPrimaryBg: "text-slate-600 dark:text-slate-600",
-      onSecondaryBg: "text-slate-600 dark:text-slate-600"
+      onPrimaryBg: "text-slate-600 dark:text-slate-400",
+      onSecondaryBg: "text-slate-600 dark:text-slate-400"
     }
   },
   background: {

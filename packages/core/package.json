@@ -10,10 +10,10 @@
     "clean": "rm -rf ./dist"
   },
   "devDependencies": {
-    "@types/axios": "^0.14.4",
     "typescript": "^4.9.5"
   },
   "dependencies": {
+    "ForzaTelemetryApi": "1.0.0",
     "axios": "^1.7.9"
   }
 }
