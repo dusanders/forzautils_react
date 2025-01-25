@@ -2,13 +2,13 @@ import React from "react";
 import { useWifiInfo } from "../hooks/useWifiInfo";
 import { Text } from './Text';
 
-export interface WifiInfoCardProps {
+export interface WifiInfoProps {
 
 }
 
-function GridCell(props: { children: any }) {
+function Container(props: { children: any }) {
   return (
-    <div className="col-span-1 m-0">
+    <div className="flex flex-col m-2">
       {props.children}
     </div>
   )
@@ -40,32 +40,28 @@ function LabeledStatusIndicator(props: LabeledStatusIndicatorProps) {
     </div>
   )
 }
-export function WifiInfoCard(props: WifiInfoCardProps) {
+export function WifiInfo(props: WifiInfoProps) {
   const wifiInfo = useWifiInfo();
 
   return (
-    <div className="box-border flex flex-col w-3/11">
-      <div className="grid grid-flow-row-dense grid-cols-2 gap-0">
-        <div className="col-span-2 row-span-1 flex flex-row place-items-center mb-2">
-          <LabeledStatusIndicator
-            dotColor="bg-lime-300"
-            label="UDP Socket" />
-          <LabeledStatusIndicator
-            dotColor="bg-red-300"
-            label="Forza Data" />
-        </div>
-        <GridCell>
+    <div className="box-border flex flex-wrap p-2">
+      <Container>
+        <LabeledStatusIndicator
+          dotColor="bg-lime-300"
+          label="UDP Socket" />
+        <LabeledStatusIndicator
+          dotColor="bg-red-300"
+          label="Forza Data" />
+      </Container>
+      <div className="flex flex-wrap">
+        <Container>
           <Text className="text-center uppercase font-bold text-xs ">Ip Address</Text>
-        </GridCell>
-        <GridCell>
-          <Text className="text-center uppercase font-bold text-xs">Port</Text>
-        </GridCell>
-        <GridCell>
           <Text className="text-center text-xs">{wifiInfo.info?.ip}</Text>
-        </GridCell>
-        <GridCell>
+        </Container>
+        <Container>
+          <Text className="text-center uppercase font-bold text-xs">Port</Text>
           <Text className="text-center text-xs">{wifiInfo.info?.listenPort}</Text>
-        </GridCell>
+        </Container>
       </div>
     </div>
   )

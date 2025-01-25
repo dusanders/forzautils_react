@@ -17,6 +17,8 @@ export interface IColorElements {
   background: {
     primary: string;
     secondary: string;
+    cardSeparator: string;
+    trackMap: string;
   }
 }
 
@@ -33,7 +35,9 @@ const themecolors: IColorElements = {
   },
   background: {
     primary: "bg-sky-200 dark:bg-slate-950",
-    secondary: "bg-sky-600 dark:bg-slate-700"
+    secondary: "bg-sky-600 dark:bg-slate-700",
+    cardSeparator: "bg-sky-600 dark:bg-sky-600/50",
+    trackMap: "bg-sky-200/50 dark:bg-slate-950/50"
   }
 }
 
