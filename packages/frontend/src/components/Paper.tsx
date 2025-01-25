@@ -8,8 +8,11 @@ export interface PaperProps extends ComponentPropsWithoutRef<'div'> {
 export function Paper(props: PaperProps) {
   const theme = useTheme();
   return (
-    <div className={`rounded-lg ${theme.colors.background.secondary} m-8 p-4`}>
+    <div className="relative m-8">
+      <div className={`absolute rounded-lg ${theme.colors.background.secondary} opacity-93 h-full w-full z-[-1]`}/>
+      <div className="p-6">
       {props.children}
+      </div>
     </div>
   )
 }

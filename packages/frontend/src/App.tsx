@@ -1,57 +1,31 @@
-import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react';
 import './App.css';
 import { useTheme } from './context/Theme';
 import { Text } from './components/Text';
-import { Header } from './components/Header';
+import { WifiInfoCard } from './components/WifiInfoCard';
 import { useForzaData } from './hooks/useForzaData';
 import { Paper } from './components/Paper';
+import { StaticAssets } from './assets';
+import { Color, Solver } from './utility/Color';
+import { BackgroundLogo } from './components/BackgroundLogo';
 
 function App() {
   const theme = useTheme();
   const [count, setCount] = useState(0);
   const forza = useForzaData();
   useEffect(() => {
+    if (!forza.packet?.data.isRaceOn) {
+      return;
+    }
     console.log(`new packet: ${forza.packet?.data.rpmData.current}`);
   }, [forza.packet]);
+
   return (
     <>
-      <Header />
+      <BackgroundLogo />
       <Paper>
-        <Text>
-          Test
-        </Text>
-        <Text variant={'secondary'} onVariant={'onSecondaryBg'}>
-          World
-        </Text>
+      <WifiInfoCard />
       </Paper>
-      <div className={`flex justify-center rounded-lg ${theme.colors.background.secondary}`}>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-        <Text element='h2'>
-          Hello world
-        </Text>
-      </div>
-      <Text element={'h1'}>
-        Vite + React
-      </Text>
-      
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }

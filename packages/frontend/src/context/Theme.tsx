@@ -32,7 +32,7 @@ const themecolors: IColorElements = {
     }
   },
   background: {
-    primary: "bg-sky-200 dark:bg-slate-900",
+    primary: "bg-sky-200 dark:bg-slate-950",
     secondary: "bg-sky-600 dark:bg-slate-700"
   }
 }

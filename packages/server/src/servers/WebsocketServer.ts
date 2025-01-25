@@ -52,7 +52,6 @@ export class WebsocketServer implements IWebsocketServer {
 
   private setupFozaUdp() {
     this.forzaSubscription = this.forzaUdp.on('packet', (data) => {
-      console.log(`packet event: ${data.byteLength}`);
       this.sendPacket(data);
     })
     this.forzaUdp.start(this.config.forzaListenPort);
