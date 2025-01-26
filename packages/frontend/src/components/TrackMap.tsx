@@ -15,18 +15,19 @@ export function TrackMap(props: TrackMapProps) {
   const [svgWidth, setSvgWidth] = useState(0);
 
   useEffect(() => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     console.log(`measure: 
-      ${svgDiv.current?.getBoundingClientRect().height}
-      ${svgDiv.current?.getBoundingClientRect().width}
+      ${width}
+      ${height}
       `);
-    const layoutHeight = svgDiv.current?.getBoundingClientRect().height;
-    const layoutWidth = svgDiv.current?.getBoundingClientRect().width;
-    setSvgHeight(layoutHeight || (layoutWidth || 200));
-    setSvgWidth(layoutWidth || 0)
+    const boxLayout = width * 0.4;
+    setSvgHeight(boxLayout);
+    setSvgWidth(boxLayout)
   }, [svgDiv]);
 
   return (
-    <Paper rootClassName='w-5/10'>
+    <Paper rootClassName='inline-block'>
       <Card
         title={(
           <Text element='h2' className='font-bold uppercase opacity-60'>

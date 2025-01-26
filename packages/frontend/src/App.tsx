@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import './App.css';
-import { Text } from './components/Text';
 import { WifiInfo } from './components/WifiInfo';
 import { useForzaData } from './hooks/useForzaData';
 import { BackgroundLogo } from './components/BackgroundLogo';
-import { Paper } from './components/Paper';
-import { Card } from './components/Card';
 import { TrackMap } from './components/TrackMap';
 
 function App() {
@@ -20,9 +17,7 @@ function App() {
   return (
     <>
       <BackgroundLogo />
-      <div>
-        <WifiInfo />
-      </div>
+      <WifiInfo />
       <TrackMap />
     </>
   )
