@@ -32,7 +32,7 @@ interface LabeledStatusIndicatorProps {
 }
 function LabeledStatusIndicator(props: LabeledStatusIndicatorProps) {
   return (
-    <div className="w-full flex flex-row justify-center content-center">
+    <div className="w-full flex flex-row">
       <BlinkDot color={props.dotColor} />
       <Text className="uppercase font-bold text-center text-xs self-center">
         {props.label}
