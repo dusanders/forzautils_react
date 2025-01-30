@@ -1,6 +1,8 @@
 import React from "react";
 import { useWifiInfo } from "../hooks/useWifiInfo";
 import { Text } from './Text';
+import { useForzaData } from "../hooks/useForzaData";
+import { useTheme } from "../context/Theme";
 
 export interface WifiInfoProps {
 
@@ -41,16 +43,23 @@ function LabeledStatusIndicator(props: LabeledStatusIndicatorProps) {
   )
 }
 export function WifiInfo(props: WifiInfoProps) {
+  const theme = useTheme();
   const wifiInfo = useWifiInfo();
-
+  const forzaData = useForzaData();
   return (
     <div className="box-border flex flex-wrap p-2">
       <Container>
         <LabeledStatusIndicator
-          dotColor="bg-lime-300"
+          dotColor={forzaData.isWebsocketOpen
+            ? theme.colors.dataStatus.connected
+            : theme.colors.dataStatus.disconnected
+          }
           label="UDP Socket" />
         <LabeledStatusIndicator
-          dotColor="bg-red-300"
+          dotColor={forzaData.packet?.data.isRaceOn
+            ? theme.colors.dataStatus.connected
+            : theme.colors.dataStatus.disconnected
+          }
           label="Forza Data" />
       </Container>
       <div className="flex flex-wrap">

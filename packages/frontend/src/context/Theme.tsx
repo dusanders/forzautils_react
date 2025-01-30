@@ -21,6 +21,10 @@ export interface IColorElements {
       valueLabel: string;
       background: string;
     }
+  },
+  dataStatus: {
+    connected: string;
+    disconnected: string;
   }
   background: {
     primary: string;
@@ -54,6 +58,10 @@ const themecolors: IColorElements = {
     secondary: "bg-sky-600 dark:bg-slate-700",
     cardSeparator: "bg-sky-600 dark:bg-sky-600/50",
     trackMap: "bg-sky-200/50 dark:bg-slate-950/50"
+  },
+  dataStatus: {
+    connected: 'bg-lime-300',
+    disconnected: 'bg-red-300'
   }
 }
 
