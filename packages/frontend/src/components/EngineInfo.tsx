@@ -7,6 +7,7 @@ import { Text } from "./Text";
 import { Utils } from "../utility/Utils";
 import { Card } from "./Card";
 import { CardTitle } from "./CardTitle";
+import { useScreenDimensions } from "../hooks/useScreenDimensions";
 
 export interface EngineInfoProps {
 
@@ -24,6 +25,7 @@ interface HpTqCurveProps {
 
 function HpTqCurve(props: HpTqCurveProps) {
   const theme = useTheme();
+  const size = useScreenDimensions();
   const rpmPoints = props.dataPoints.map(i => i.rpm)
   const hpSeries: LineSeriesType = {
     type: 'line',
@@ -40,7 +42,7 @@ function HpTqCurve(props: HpTqCurveProps) {
   return (
     <LineChart
       height={300}
-      width={300}
+      width={Utils.getGraphWidth(size.dimensions.innerWidth)}
       xAxis={[{
         data: rpmPoints,
       }]}
@@ -202,7 +204,7 @@ export function EngineInfo(props: EngineInfoProps) {
         )}
         body={(
           <>
-            <div className="flex mb-4 justify-between">
+            <div className="flex mb-4 justify-evenly">
               <LabeledGauge
                 label="RPM"
                 value={engineInfo.currentRpm || (engineInfo.maxRpm * 0.3)}

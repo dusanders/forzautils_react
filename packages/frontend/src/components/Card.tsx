@@ -10,12 +10,12 @@ export interface CardProps {
 export function Card(props: CardProps) {
   const theme = useTheme();
   return (
-    <div className={` ${props.rootClassName || ''}`}>
+    <div className={`flex flex-col ${props.rootClassName || ''}`}>
       <div className="mb-2 p-2 place-content-center">
         {props.title}
       </div>
       <div className={`h-[1px] w-full ${theme.colors.background.cardSeparator}`} />
-      <div className="mt-2 p-2">
+      <div className="mt-2 p-2 h-full w-full">
         {props.body}
       </div>
     </div>

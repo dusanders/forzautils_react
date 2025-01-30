@@ -16,4 +16,10 @@ export class Utils {
       return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
     });
   }
+  static getGraphWidth(screenWidth: number) {
+    if(screenWidth > 800) {
+      return screenWidth * 0.4;
+    }
+    return screenWidth * 0.8;
+  }
 }
