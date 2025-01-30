@@ -4,6 +4,7 @@ import { WifiInfo } from './components/WifiInfo';
 import { useForzaData } from './hooks/useForzaData';
 import { BackgroundLogo } from './components/BackgroundLogo';
 import { TrackMap } from './components/TrackMap';
+import { EngineInfo } from './components/EngineInfo';
 
 function App() {
   const forza = useForzaData();
@@ -18,7 +19,10 @@ function App() {
     <>
       <BackgroundLogo />
       <WifiInfo />
-      <TrackMap />
+      <div className='flex flex-wrap'>
+        <TrackMap />
+        <EngineInfo />
+      </div>
     </>
   )
 }

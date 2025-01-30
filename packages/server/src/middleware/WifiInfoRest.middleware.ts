@@ -13,7 +13,7 @@ export class WifiInfoMiddleware implements IMiddleware {
   }
 
   attach(app: Application): Application {
-    app.get(HttpRoutes.wifiInfo, this.getWifiInfo.bind(this));
+    app.get(HttpRoutes.wifiInfoRest, this.getWifiInfo.bind(this));
     return app;
   }
 

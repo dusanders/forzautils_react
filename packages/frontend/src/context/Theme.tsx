@@ -13,6 +13,14 @@ export interface IColorElements {
       onPrimaryBg: string;
       onSecondaryBg: string;
     }
+  },
+  charts: {
+    line: {
+      axisLine: string;
+      tick: string;
+      valueLabel: string;
+      background: string;
+    }
   }
   background: {
     primary: string;
@@ -31,6 +39,14 @@ const themecolors: IColorElements = {
     secondary: {
       onPrimaryBg: "text-slate-600 dark:text-slate-400",
       onSecondaryBg: "text-slate-600 dark:text-slate-400"
+    }
+  },
+  charts: {
+    line: {
+      tick: 'rgb(92, 157, 203)',
+      valueLabel: 'rgb(92, 157, 203)',
+      axisLine: 'rgb(92, 157, 203)',
+      background: 'rgba(0,0,0,0.4)'
     }
   },
   background: {

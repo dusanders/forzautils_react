@@ -10,7 +10,7 @@ export function useWifiInfo(): WifiInfoHook {
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await (new Api()).wifiApi.getIpInfo();
+      const response = await (new Api()).wifiApi.getIpInfoQL();
       setInfo(response.data);
     }
     fetch();

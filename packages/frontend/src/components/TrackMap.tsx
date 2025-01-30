@@ -3,6 +3,7 @@ import { Card } from "./Card";
 import { Paper } from "./Paper";
 import { Text } from './Text';
 import { useTheme } from "../context/Theme";
+import { CardTitle } from "./CardTitle";
 
 export interface TrackMapProps {
 
@@ -30,9 +31,7 @@ export function TrackMap(props: TrackMapProps) {
     <Paper rootClassName='inline-block'>
       <Card
         title={(
-          <Text element='h2' className='font-bold uppercase opacity-60'>
-            Track Map
-          </Text>
+          <CardTitle title="Track Map" />
         )}
         body={(
           <div ref={svgDiv} id="trackmap_root" className='w-full'>

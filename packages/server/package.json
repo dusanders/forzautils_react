@@ -20,6 +20,8 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "fs-extra": "^11.3.0",
+    "graphql": "^16.10.0",
+    "graphql-http": "^1.22.4",
     "ip": "^2.0.1",
     "uWebSockets.js": "uNetworking/uWebSockets.js#v20.51.0"
   },

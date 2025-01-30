@@ -4,7 +4,7 @@ import { on_theme_variant, theme_variant, useTheme } from "../context/Theme";
 export interface TextProps extends
   ComponentPropsWithoutRef<'p'>,
   ComponentPropsWithoutRef<'h1'>,
-  ComponentPropsWithoutRef<'h2'>{
+  ComponentPropsWithoutRef<'h2'> {
   element?: 'p' | 'h1' | 'h2';
   variant?: theme_variant;
   onVariant?: on_theme_variant;
@@ -20,18 +20,20 @@ export function Text(props: TextProps) {
   switch (props.element) {
     case 'h1':
       return (
-        <h1 className={`${color} ${props.className}`}>
+        <h1  {...props} className={`${color} ${props.className}`}>
           {props.children}
         </h1>
       );
     case 'h2':
       return (
-        <h2 className={`${color} ${props.className}`}>
+        <h2 {...props} className={`${color} ${props.className}`}>
           {props.children}
         </h2>
       )
   }
   return (
-    <p className={`${color} ${props.className}`}>{props.children}</p>
+    <p  {...props} className={`${color} ${props.className}`}>
+      {props.children}
+    </p>
   )
 }
