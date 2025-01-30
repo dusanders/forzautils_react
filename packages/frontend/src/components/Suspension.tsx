@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Paper } from "./Paper";
 import { Card } from "./Card";
 import { CardTitle } from "./CardTitle";
@@ -6,6 +6,8 @@ import { LineChart, LineSeriesType, SparkLineChart } from "@mui/x-charts";
 import { Utils } from "../utility/Utils";
 import { useTheme } from "../context/Theme";
 import { useScreenDimensions } from "../hooks/useScreenDimensions";
+import { useForzaData } from "../hooks/useForzaData";
+import { LimitedArray } from "../utility/LimitedArray";
 
 interface SuspensionGraphProps {
   setA: number[];
@@ -71,11 +73,41 @@ export interface SuspensionProps {
 
 }
 
+interface SuspensionState {
+  leftFront: LimitedArray<number>;
+  rightFront: LimitedArray<number>;
+  leftRear: LimitedArray<number>;
+  rightRear: LimitedArray<number>;
+}
+const initialState: SuspensionState = {
+  leftFront: new LimitedArray(100, [0, 3, 2, 4, 1, 0]),
+  rightFront: new LimitedArray(100, [0.5, 1.4, 3, 5, 2]),
+  leftRear: new LimitedArray(100, [3, 2, 1.2, 3, 4.2]),
+  rightRear: new LimitedArray(100, [2, 1.2, 3, 2, 5])
+}
 export function Suspension(props: SuspensionProps) {
-  const lfData = [0, 3, 2, 4, 1, 0];
-  const rfData = [0.5, 1.4, 3, 5, 2];
-  const lrData = [3, 2, 1.2, 3, 4.2];
-  const rrData = [2, 1.2, 3, 2, 5];
+  const forza = useForzaData();
+  const [state, setState] = useState<SuspensionState>(initialState);
+
+  useEffect(() => {
+    if (!forza.packet || !forza.packet.data.isRaceOn) {
+      return;
+    }
+    setState({
+      leftFront: state.leftFront.push(
+        forza.packet.data.normalizedSuspensionTravel.leftFront
+      ),
+      rightFront: state.rightFront.push(
+        forza.packet.data.normalizedSuspensionTravel.rightFront
+      ),
+      leftRear: state.leftRear.push(
+        forza.packet.data.normalizedSuspensionTravel.leftRear
+      ),
+      rightRear: state.rightRear.push(
+        forza.packet.data.normalizedSuspensionTravel.rightRear
+      )
+    });
+  }, [forza.packet]);
 
   return (
     <Paper>
@@ -84,14 +116,14 @@ export function Suspension(props: SuspensionProps) {
         body={(
           <>
             <SuspensionGraph
-              setA={lfData}
+              setA={state.leftFront.data}
               labelA="Left Front"
-              setB={rfData}
+              setB={state.rightFront.data}
               labelB="Right Front" />
             <SuspensionGraph
-              setA={lrData}
+              setA={state.leftRear.data}
               labelA="Left Rear"
-              setB={rrData}
+              setB={state.rightRear.data}
               labelB="Right Rear" />
           </>
         )} />
