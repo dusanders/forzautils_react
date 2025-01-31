@@ -1,4 +1,4 @@
-import React, { ComponentPropsWithoutRef, ReactElement, ReactHTMLElement } from "react";
+import { ComponentPropsWithoutRef } from "react";
 import { on_theme_variant, theme_variant, useTheme } from "../context/Theme";
 
 export interface TextProps extends

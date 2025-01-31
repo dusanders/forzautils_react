@@ -1,8 +1,8 @@
 import React from "react";
 import { useWifiInfo } from "../hooks/useWifiInfo";
 import { Text } from './Text';
-import { useForzaData } from "../hooks/useForzaData";
 import { useTheme } from "../context/Theme";
+import { useForzaData } from "../context/ForzaContext";
 
 export interface WifiInfoProps {
 

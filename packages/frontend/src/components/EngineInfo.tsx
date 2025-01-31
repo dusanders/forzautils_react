@@ -2,12 +2,12 @@ import { Gauge, LineChart, LineSeriesType } from "@mui/x-charts";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTheme } from "../context/Theme";
 import { Paper } from "./Paper";
-import { useForzaData } from "../hooks/useForzaData";
 import { Text } from "./Text";
 import { Utils } from "../utility/Utils";
 import { Card } from "./Card";
 import { CardTitle } from "./CardTitle";
 import { useScreenDimensions } from "../hooks/useScreenDimensions";
+import { useForzaData } from "../context/ForzaContext";
 
 export interface EngineInfoProps {
 
@@ -32,12 +32,14 @@ function HpTqCurve(props: HpTqCurveProps) {
     data: props.dataPoints.map(i => i.hp),
     label: 'HP',
     id: 'hp',
+    showMark: false
   };
   const tqSeries: LineSeriesType = {
     type: 'line',
     data: props.dataPoints.map(i => i.tq),
     label: 'TQ',
     id: 'tq',
+    showMark: false
   }
   return (
     <LineChart
@@ -46,6 +48,7 @@ function HpTqCurve(props: HpTqCurveProps) {
       xAxis={[{
         data: rpmPoints,
       }]}
+      axisHighlight={{ x: 'none', y: 'none' }}
       series={[hpSeries, tqSeries]}
       title="Horsepower"
       sx={{
@@ -171,8 +174,39 @@ export function EngineInfo(props: EngineInfoProps) {
   const forza = useForzaData();
   const [engineInfo, setEngineInfo] = useState<EngineInfoState>(initialState);
 
+  // Don't add duplicates - update existing data points
+  const addOrUpdateDataPoint = (dataPoints: RpmDataPoint[]) => {
+    const found = engineInfo.dataPoints.find((i) => i.rpm === forza.packet?.data.rpmData.current);
+    if (found) {
+      if (found.hp < forza.packet!.data.getHorsepower()) {
+        found.hp = forza.packet!.data.getHorsepower();
+      }
+      if (found.tq < forza.packet!.data.torque) {
+        found.tq = forza.packet!.data.torque;
+      }
+    } else {
+      dataPoints.push({
+        rpm: Math.round(forza.packet!.data.rpmData.current),
+        hp: forza.packet!.data.getHorsepower(),
+        tq: forza.packet!.data.torque
+      });
+    }
+    return dataPoints;
+  }
+
+  // Check if we are in decel situation
+  const isDecel = (dataPoints: RpmDataPoint[]) => {
+    return forza.packet!.data.rpmData.current < dataPoints[dataPoints.length - 1].rpm
+  }
+
+  // We only want to capture steps of RPM, not every data point!
+  const isRpmStep = () => {
+    return (Math.round(forza.packet!.data.rpmData.current) % 100) === 0;
+  }
+
   useEffect(() => {
-    if (!forza.packet || !forza.packet.data.isRaceOn) {
+    if (!forza.packet || !forza.packet.data.isRaceOn
+      || !isRpmStep() || isDecel(engineInfo.dataPoints)) {
       return;
     }
     let dataPoints = [...engineInfo.dataPoints];
@@ -180,19 +214,15 @@ export function EngineInfo(props: EngineInfoProps) {
     if (forza.packet.data.gear !== engineInfo.gear) {
       dataPoints = [];
     } else {
-      dataPoints.push({
-        rpm: forza.packet.data.rpmData.current,
-        hp: forza.packet.data.getHorsepower(),
-        tq: forza.packet.data.torque
-      });
+      dataPoints = addOrUpdateDataPoint(dataPoints);
     }
     setEngineInfo({
       dataPoints: dataPoints,
       minRpm: forza.packet.data.rpmData.idle,
       maxRpm: forza.packet.data.rpmData.max,
-      currentRpm: forza.packet.data.rpmData.current,
+      currentRpm: Math.round(forza.packet.data.rpmData.current),
       gear: forza.packet.data.gear,
-      throttle: forza.packet.data.throttle
+      throttle: Math.round(forza.packet.data.throttle)
     })
   }, [forza.packet]);
 
