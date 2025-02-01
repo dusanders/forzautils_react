@@ -6,6 +6,7 @@ import { TrackMap } from './components/TrackMap';
 import { EngineInfo } from './components/EngineInfo';
 import { Suspension } from './components/Suspension';
 import { useForzaData } from './context/ForzaContext';
+import { TireInfo } from './components/TireInfo';
 
 function App() {
   const forza = useForzaData();
@@ -23,6 +24,7 @@ function App() {
         <TrackMap />
         <EngineInfo />
         <Suspension />
+        <TireInfo />
       </div>
     </>
   )

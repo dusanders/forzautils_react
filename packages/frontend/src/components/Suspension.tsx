@@ -1,152 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Paper } from "./Paper";
 import { Card } from "./Card";
 import { CardTitle } from "./CardTitle";
-import { LineChart, LineSeriesType, SparkLineChart } from "@mui/x-charts";
-import { Line } from 'react-chartjs-2';
-import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
-import { Utils } from "../utility/Utils";
-import { useTheme } from "../context/Theme";
-import { useScreenDimensions } from "../hooks/useScreenDimensions";
 import { LimitedArray } from "../utility/LimitedArray";
 import { useForzaData } from "../context/ForzaContext";
-
-interface SuspensionGraphProps {
-  setA: number[];
-  setB: number[];
-  labelA: string;
-  labelB: string;
-  ref?: any;
-}
-
-function SuspensionGraph(props: SuspensionGraphProps) {
-  const theme = useTheme();
-  const size = useScreenDimensions();
-
-  // const seriesA: LineSeriesType = {
-  //   type: 'line',
-  //   data: props.setA,
-  //   label: props.labelA,
-  //   id: Utils.randomKey(),
-  //   disableHighlight: true,
-  //   showMark: false
-  // };
-  // const seriesB: LineSeriesType = {
-  //   type: 'line',
-  //   data: props.setB,
-  //   label: props.labelB,
-  //   id: Utils.randomKey(),
-  //   disableHighlight: true,
-  //   showMark: false,
-  // }
-
-  return (
-    <>
-      <Line
-        ref={props.ref}
-        className="mt-2"
-        id={Utils.randomKey()}
-        style={{
-          backgroundColor: theme.colors.charts.line.background,
-          borderRadius: 6
-        }}
-        width={Utils.getGraphWidth(size.dimensions.innerWidth)}
-        options={{
-          spanGaps: true,
-          aspectRatio: 16 / 9,
-          elements: {
-            point: {
-              pointStyle: false,
-              radius: 0
-            },
-            line: {
-              tension: 0.3
-            }
-          },
-          scales: {
-            y: {
-              ticks: {
-                color: theme.colors.charts.line.valueLabel
-              },
-              grid: {
-                display: false
-              }
-            }
-          },
-          plugins: {
-            tooltip: {
-              enabled: false
-            },
-            legend: {
-              labels: {
-                boxWidth: 18,
-                useBorderRadius: true,
-                borderRadius: 2,
-                color: theme.colors.charts.line.valueLabel,
-                font: {
-                  size: 18
-                }
-              }
-            }
-          }
-        }}
-        data={{
-          labels: props.setA.map(i => ''),
-          datasets: [
-            {
-              label: props.labelA,
-              data: props.setA,
-              borderColor: 'rgb(2, 178, 175)',
-              backgroundColor: 'rgb(2, 178, 175)',
-            },
-            {
-              label: props.labelB,
-              data: props.setB,
-              borderColor: 'rgb(46, 150, 255)',
-              backgroundColor: 'rgb(46, 150, 255)',
-            }
-          ]
-        }} />
-      {/* <LineChart
-        className="m-2"
-        height={300}
-        width={Utils.getGraphWidth(size.dimensions.innerWidth)}
-        series={[
-          seriesA,
-          seriesB
-        ]}
-        axisHighlight={{ x: 'none', y: 'none' }}
-        sx={{
-          backgroundColor: theme.colors.charts.line.background,
-          borderRadius: 2,
-          '& .MuiChartsAxis-bottom': {
-            display: 'none'
-          },
-          '& .MuiChartsLegend-root': {
-            '& .MuiChartsLegend-series': {
-              'text': {
-                fill: `${theme.colors.charts.line.valueLabel} !important`
-              }
-            }
-          },
-          '& .MuiChartsAxis-root': {
-            '& .MuiChartsAxis-line': {
-              stroke: theme.colors.charts.line.axisLine
-            },
-            '& .MuiChartsAxis-tickContainer': {
-              '& .MuiChartsAxis-tickLabel': {
-                fill: theme.colors.charts.line.valueLabel
-              },
-              '& .MuiChartsAxis-tick': {
-                stroke: theme.colors.charts.line.tick
-              },
-            }
-          }
-        }} /> */}
-    </>
-  )
-}
+import { StackedLineGraph } from "./StackedLineGraph";
+import { useTheme } from "../context/Theme";
 
 export interface SuspensionProps {
 
@@ -157,15 +16,22 @@ interface SuspensionState {
   rightFront: LimitedArray<number>;
   leftRear: LimitedArray<number>;
   rightRear: LimitedArray<number>;
+  yaw: LimitedArray<number>;
+  pitch: LimitedArray<number>;
+  roll: LimitedArray<number>;
 }
 const initialState: SuspensionState = {
   leftFront: new LimitedArray(20, [2, 1, 3, 4, 1, 2, 5]),
   rightFront: new LimitedArray(20, [3, 1, 2, 3, 4, 2, 6]),
   leftRear: new LimitedArray(20, [5, 4, 3, 2, 1, 2, 3]),
-  rightRear: new LimitedArray(20, [4, 3, 2, 1, 5, 6])
+  rightRear: new LimitedArray(20, [4, 3, 2, 1, 5, 6]),
+  yaw: new LimitedArray(20, [9, 3, 2, 3, 4, 5, 3]),
+  pitch: new LimitedArray(20, [5, 3, 2, 1, 4, 3, 2]),
+  roll: new LimitedArray(20, [6, 5, 7, 8, 3, 1, 2])
 }
 
 export function Suspension(props: SuspensionProps) {
+  const theme = useTheme();
   const forza = useForzaData();
   const [state, setState] = useState<SuspensionState>(initialState);
 
@@ -188,26 +54,75 @@ export function Suspension(props: SuspensionProps) {
       ),
       rightRear: state.rightRear.push(
         forza.packet.data.normalizedSuspensionTravel.rightRear
+      ),
+      yaw: state.yaw.push(
+        forza.packet.data.yaw
+      ),
+      pitch: state.pitch.push(
+        forza.packet.data.pitch
+      ),
+      roll: state.pitch.push(
+        forza.packet.data.roll
       )
     });
   }, [forza.packet]);
 
   return (
-    <Paper>
+    <Paper innerClassName="justify-between flex flex-col h-full">
       <Card
         title={(<CardTitle title="Suspension" />)}
         body={(
           <>
-            <SuspensionGraph
-              setA={state.leftFront.data}
-              labelA="Left Front"
-              setB={state.rightFront.data}
-              labelB="Right Front" />
-            <SuspensionGraph
-              setA={state.leftRear.data}
-              labelA="Left Rear"
-              setB={state.rightRear.data}
-              labelB="Right Rear" />
+            <StackedLineGraph
+              title="SUSPENSION TRAVEL"
+              data={[
+                {
+                  label: 'Left Front',
+                  data: state.leftFront.data,
+                  borderColor: theme.colors.charts.leftFrontColor,
+                  backgroundColor: theme.colors.charts.leftFrontColor
+                },
+                {
+                  label: 'Right Front',
+                  data: state.rightFront.data,
+                  borderColor: theme.colors.charts.rightFrontColor,
+                  backgroundColor: theme.colors.charts.rightFrontColor
+                },
+                {
+                  label: 'Left Rear',
+                  data: state.leftRear.data,
+                  borderColor: theme.colors.charts.leftRearColor,
+                  backgroundColor: theme.colors.charts.leftRearColor
+                },
+                {
+                  label: 'Right Rear',
+                  data: state.rightRear.data,
+                  borderColor: theme.colors.charts.rightRearColor,
+                  backgroundColor: theme.colors.charts.rightRearColor
+                }
+              ]} />
+            <StackedLineGraph
+              title="CHASSIS ANGLE"
+              data={[
+                {
+                  label: 'Yaw',
+                  data: state.yaw.data,
+                  borderColor: theme.colors.charts.yawColor,
+                  backgroundColor: theme.colors.charts.yawColor
+                },
+                {
+                  label: 'Pitch',
+                  data: state.pitch.data,
+                  borderColor: theme.colors.charts.pitchColor,
+                  backgroundColor: theme.colors.charts.pitchColor
+                },
+                {
+                  label: 'Roll',
+                  data: state.roll.data,
+                  borderColor: theme.colors.charts.rollColor,
+                  backgroundColor: theme.colors.charts.rollColor
+                }
+              ]} />
           </>
         )} />
     </Paper>

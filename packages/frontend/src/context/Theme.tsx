@@ -20,7 +20,14 @@ export interface IColorElements {
       tick: string;
       valueLabel: string;
       background: string;
-    }
+    },
+    leftFrontColor: string;
+    rightFrontColor: string;
+    leftRearColor: string;
+    rightRearColor: string;
+    yawColor: string;
+    pitchColor: string;
+    rollColor: string;
   },
   dataStatus: {
     connected: string;
@@ -51,7 +58,14 @@ const themecolors: IColorElements = {
       valueLabel: 'rgb(92, 157, 203)',
       axisLine: 'rgb(92, 157, 203)',
       background: 'rgba(0,0,0,0.4)'
-    }
+    },
+    leftFrontColor: 'rgb(2, 178,175)',
+    rightFrontColor: 'rgb(46,150,255)',
+    leftRearColor: 'rgb(2, 91, 89)',
+    rightRearColor: 'rgb(3, 85, 148)',
+    yawColor: 'rgb(0, 163, 54)',
+    pitchColor: 'rgb(103, 0, 207)',
+    rollColor: 'rgb(0, 70, 209)'
   },
   background: {
     primary: "bg-sky-200 dark:bg-slate-950",
