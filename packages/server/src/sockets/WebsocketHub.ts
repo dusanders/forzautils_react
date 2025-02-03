@@ -1,7 +1,11 @@
 import { DISABLED, HttpRequest, HttpResponse, us_socket_context_t, WebSocket, WebSocketBehavior } from "uWebSockets.js";
 import { IWebsocketInfo } from "../types/WebsocketInfo.js";
-import { PublicSubscriptions } from "../types/Constants.js";
 import { ByteEncoder } from "../utilities/ByteEncoder.js";
+import { SocketTopics } from "@forzautils/core";
+
+export interface WebsocketHubDependency {
+  onIncomingMessage(ws: WebSocket<IWebsocketInfo>, data: ArrayBuffer): void;
+}
 
 export class WebsocketHub {
   behavior: WebSocketBehavior<IWebsocketInfo> = {
@@ -13,12 +17,17 @@ export class WebsocketHub {
     open: this.open.bind(this),
     message: this.message.bind(this),
     upgrade: this.upgrade.bind(this),
-    drain: this.drain.bind(this)
+    drain: this.drain.bind(this),
+  }
+
+  private deps: WebsocketHubDependency;
+  constructor(deps: WebsocketHubDependency) {
+    this.deps = deps;
   }
 
   private open(ws: WebSocket<IWebsocketInfo>) {
     console.log(`websocket.open()`);
-    ws.subscribe(PublicSubscriptions.ForzaData);
+    ws.subscribe(SocketTopics.LiveData);
     ws.send(
       Buffer.from(
         JSON.stringify({ "type": "hello" })
@@ -36,7 +45,7 @@ export class WebsocketHub {
   }
 
   private message(ws: WebSocket<IWebsocketInfo>, message: ArrayBuffer, isBinary: boolean) {
-    console.log(`${JSON.stringify(ws.getUserData())} - ${ByteEncoder.decode(message)}`);
+    this.deps.onIncomingMessage(ws, message);
   }
 
   private upgrade(res: HttpResponse, req: HttpRequest, context: us_socket_context_t) {
