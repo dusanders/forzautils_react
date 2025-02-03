@@ -5,6 +5,15 @@ import { createHandler } from "graphql-http/lib/use/express";
 import { buildSchema, GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import { IRecordData } from "../services/Recorder.js";
 
+const recordedFile_schema = new GraphQLObjectType({
+  name: 'RecordedFile',
+  fields: {
+    filename: { type: GraphQLString },
+    date: { type: GraphQLString },
+    packetLen: { type: GraphQLString },
+    trackId: { type: GraphQLString }
+  }
+});
 
 export class RecorderQLMiddleware implements IMiddleware {
   private recorder: IRecordData;
@@ -25,15 +34,7 @@ export class RecorderQLMiddleware implements IMiddleware {
           name: 'Query',
           fields: {
             previousRuns: {
-              type: new GraphQLList(new GraphQLObjectType({
-                name: 'RecordedFile',
-                fields: {
-                  filename: { type: GraphQLString },
-                  date: { type: GraphQLString },
-                  packetLen: { type: GraphQLString },
-                  trackId: { type: GraphQLString }
-                }
-              })),
+              type: new GraphQLList(recordedFile_schema),
               args: {
                 rangeStart: { type: GraphQLInt },
                 rangeEnd: { type: GraphQLInt }
@@ -52,6 +53,6 @@ export class RecorderQLMiddleware implements IMiddleware {
 
   private async getAllFiles() {
     const all = await this.recorder.getAllRecordings();
-    return JSON.stringify(all);
+    return all;
   }
 }

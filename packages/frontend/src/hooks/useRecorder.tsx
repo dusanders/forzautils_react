@@ -11,6 +11,7 @@ export function useRecorder(): Recorder {
   useEffect(() => {
     const fetch = async () => {
       const response = await (new Api()).recorded.getAllPreviousRest();
+      const qlRes = await (new Api()).recorded.getAllPreviousRuns({rangeEnd: 0,rangeStart: 0});
       setAllFiles(response.data);
     }
     fetch();
