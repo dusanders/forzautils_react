@@ -20,6 +20,7 @@ export interface IColorElements {
       tick: string;
       valueLabel: string;
       background: string;
+      indicator: string;
     },
     leftFrontColor: string;
     rightFrontColor: string;
@@ -57,7 +58,8 @@ const themecolors: IColorElements = {
       tick: 'rgb(92, 157, 203)',
       valueLabel: 'rgb(92, 157, 203)',
       axisLine: 'rgb(92, 157, 203)',
-      background: 'rgba(0,0,0,0.4)'
+      background: 'rgba(0,0,0,0.4)',
+      indicator: 'rgb(198, 219, 237)'
     },
     leftFrontColor: 'rgb(2, 178,175)',
     rightFrontColor: 'rgb(46,150,255)',

@@ -8,4 +8,8 @@ export interface IWebsocketServerConfig {
   forzaListenPort: number;
 }
 
-export type AppConfig = IServerConfig & IWebsocketServerConfig;
+export interface IRecordDataConfig {
+  parentDir: string;
+}
+
+export type AppConfig = IServerConfig & IWebsocketServerConfig & IRecordDataConfig;

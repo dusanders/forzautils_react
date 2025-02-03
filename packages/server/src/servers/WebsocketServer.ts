@@ -2,32 +2,22 @@ import { App, TemplatedApp } from "uWebSockets.js";
 import { IWebsocketServerConfig } from "../types/ServerConfig.js";
 import { IWebsocketServer } from "../types/Server.js";
 import { WebsocketHub } from "../sockets/WebsocketHub.js";
-import { IConfigureUdpSocket, UdpEventSubscription } from "../types/ForzaUdpTypes.js";
-import { ByteEncoder } from "../utilities/ByteEncoder.js";
+import { ISubscribeUdpEvents, UdpEventSubscription } from "../types/ForzaUdpTypes.js";
 import { PublicSubscriptions } from "../types/Constants.js";
-import { IncomingUdpListener } from "../sockets/IncomingUdpSocket.js";
 import { WebsocketRoutes } from "@forzautils/core"
 
 export class WebsocketServer implements IWebsocketServer {
   private config: IWebsocketServerConfig;
   private wsApp: TemplatedApp;
   private hub: WebsocketHub;
-  private forzaUdp: IncomingUdpListener;
+  private forzaUdp: ISubscribeUdpEvents;
   private forzaSubscription?: UdpEventSubscription;
-  private udpConfig: IConfigureUdpSocket = {
-    currentPort: 0
-  }
 
-  constructor(config: IWebsocketServerConfig) {
+  constructor(config: IWebsocketServerConfig, updSocket: ISubscribeUdpEvents) {
     this.config = config;
     this.wsApp = App();
     this.hub = new WebsocketHub();
-    this.forzaUdp = new IncomingUdpListener();
-    this.udpConfig.currentPort = config.forzaListenPort;
-  }
-
-  getForzaUdpSocketConfig(): IConfigureUdpSocket {
-    return this.udpConfig
+    this.forzaUdp = updSocket;
   }
 
   start() {
@@ -44,7 +34,6 @@ export class WebsocketServer implements IWebsocketServer {
 
   stop() {
     this.wsApp.close();
-    this.forzaUdp.stop();
     if(this.forzaSubscription) {
       this.forzaSubscription.remove();
     }
@@ -53,8 +42,7 @@ export class WebsocketServer implements IWebsocketServer {
   private setupFozaUdp() {
     this.forzaSubscription = this.forzaUdp.on('packet', (data) => {
       this.sendPacket(data);
-    })
-    this.forzaUdp.start(this.config.forzaListenPort);
+    });
   }
 
   private sendPacket(bytes: Buffer<ArrayBufferLike>): void {

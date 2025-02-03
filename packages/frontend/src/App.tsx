@@ -7,6 +7,7 @@ import { EngineInfo } from './components/EngineInfo';
 import { Suspension } from './components/Suspension';
 import { useForzaData } from './context/ForzaContext';
 import { TireInfo } from './components/TireInfo';
+import { useRecorder } from './hooks/useRecorder';
 
 function App() {
   const forza = useForzaData();
@@ -15,6 +16,7 @@ function App() {
       return;
     }
   }, [forza.packet]);
+  const recorder = useRecorder();
 
   return (
     <>

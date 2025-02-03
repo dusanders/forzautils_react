@@ -5,5 +5,7 @@ export enum WebsocketRoutes {
 export enum HttpRoutes {
   baseUrl = 'http://127.0.0.1',
   wifiInfoQL = '/wifi-info-ql',
-  wifiInfoRest = '/wifi-info-rest'
+  wifiInfoRest = '/wifi-info-rest',
+  recordedFilesQL = '/recorded-files-ql',
+  recordedFilesRest = '/recorded-files-rest',
 }

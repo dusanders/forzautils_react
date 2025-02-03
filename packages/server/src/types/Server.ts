@@ -7,7 +7,6 @@ export interface IServer {
 }
 
 export interface IWebsocketServer {
-  getForzaUdpSocketConfig(): IConfigureUdpSocket;
   start(): void;
   stop(): void;
 }

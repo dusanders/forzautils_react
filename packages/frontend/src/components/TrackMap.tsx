@@ -34,7 +34,7 @@ export function TrackMap(props: TrackMapProps) {
   const forza = useForzaData();
   const [path, setPath] = useState('');
   const [raceInfo, setRaceInfo] = useState<RaceInfo>({ currentLap: 0, currentPosition: 0 });
-  const [positions, setPositions] = useState<PlayerPosition[]>([]);
+  const [positions, setPositions] = useState<PlayerPosition[]>([{ x: 0, y: 0 }]);
   const [viewBox, setViewBox] = useState<ViewBoxState>({
     minX: -10,
     minY: -10,
@@ -104,6 +104,8 @@ export function TrackMap(props: TrackMapProps) {
                 Lap: {raceInfo.currentLap} Pos: {raceInfo.currentPosition}
               </text>
               <path stroke={theme.colors.charts.line.axisLine} strokeWidth={1} d={path} strokeLinecap={'round'} />
+              <circle x={positions[positions.length - 1].x} y={positions[positions.length - 1].y} r={fontSize * 0.5}
+                fill={theme.colors.charts.line.indicator} />
             </svg>
           </div>
         )} />

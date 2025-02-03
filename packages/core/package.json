@@ -7,13 +7,18 @@
   "type": "module",
   "scripts": {
     "build": "yarn clean && tsc",
-    "clean": "rm -rf ./dist"
+    "clean": "rm -rf ./dist",
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "devDependencies": {
-    "typescript": "^4.9.5"
+    "@graphql-codegen/cli": "5.0.4",
+    "typescript": "^4.9.5",
+    "@graphql-codegen/introspection": "4.0.3",
+    "@graphql-codegen/client-preset": "4.6.1"
   },
   "dependencies": {
     "ForzaTelemetryApi": "1.0.0",
-    "axios": "^1.7.9"
+    "axios": "^1.7.9",
+    "graphql": "^16.10.0"
   }
 }

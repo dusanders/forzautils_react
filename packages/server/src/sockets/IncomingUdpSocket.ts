@@ -3,16 +3,17 @@ import {
   ISubscribeUdpEvents,
   UdpDataEventMap,
   UdpEventSubscription,
-  ForzaDataEmitter
+  ForzaDataEmitter,
+  IConfigureUdpSocket
 } from '../types/ForzaUdpTypes.js';
 
-export class IncomingUdpListener implements ISubscribeUdpEvents {
+export class IncomingUdpListener implements ISubscribeUdpEvents, IConfigureUdpSocket {
   private socket?: dgram.Socket;
   private emitter: ForzaDataEmitter = new ForzaDataEmitter();
-  private port: number = 0;
+  currentPort: number = 0;
   
   start(port: number) {
-    this.port = port;
+    this.currentPort = port;
     const socket = dgram.createSocket('udp4');
     socket.once('error', this.bindError.bind(this))
       .once('listening', this.socketOpen.bind(this))
@@ -41,7 +42,7 @@ export class IncomingUdpListener implements ISubscribeUdpEvents {
   }
 
   private socketOpen() {
-    console.log(`Socket did open ${this.port}`);
+    console.log(`Socket did open ${this.currentPort}`);
     // TODO - remove this debug
     // this.DEBUG();
   }
