@@ -11,14 +11,10 @@
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "5.0.4",
-    "typescript": "^4.9.5",
-    "@graphql-codegen/introspection": "4.0.3",
-    "@graphql-codegen/client-preset": "4.6.1"
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "ForzaTelemetryApi": "1.0.0",
-    "axios": "^1.7.9",
-    "graphql": "^16.10.0"
+    "axios": "^1.7.9"
   }
 }
