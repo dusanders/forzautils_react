@@ -53,6 +53,12 @@ export class RecorderQLMiddleware implements IMiddleware {
 
   private async getAllFiles() {
     const all = await this.recorder.getAllRecordings();
+    all.push({
+      trackId: '0',
+      date: `${Date.now()}`,
+      packetLen: '311',
+      filename: 'name'
+    })
     return all;
   }
 }

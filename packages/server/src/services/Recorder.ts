@@ -3,15 +3,16 @@ const { existsSync, mkdirp, readdir } = FS;
 import { ISubscribeUdpEvents, UdpEventSubscription } from "../types/ForzaUdpTypes.js";
 import { IRecordDataConfig } from "../types/ServerConfig.js";
 import * as Path from 'path';
-import { Filename, IFilename, IForzaFile } from './Filename.js';
+import { Filename, IFilename } from './Filename.js';
 import { FileWriter, IFileWriter } from './FileWriter.js';
 import { FileReader, IFileReader } from './FileReader.js';
+import { RecordedFile } from '@forzautils/core';
 
 export interface IRecordData {
   initialize(): Promise<void>;
   startRecording(trackId: string): void;
   stopRecording(): void;
-  getAllRecordings(): Promise<IForzaFile[]>;
+  getAllRecordings(): Promise<RecordedFile[]>;
   playback(filename: string): IFileReader;
 }
 
@@ -55,10 +56,10 @@ export class ForzaDataRecorder implements IRecordData {
     this.packetSub = undefined;
   }
 
-  async getAllRecordings(): Promise<IForzaFile[]> {
+  async getAllRecordings(): Promise<RecordedFile[]> {
     const dataDir = Path.resolve(this.config.parentDir);
     const allFiles = await readdir(dataDir);
-    return allFiles.map<IForzaFile>((i) => {
+    return allFiles.map<RecordedFile>((i) => {
       return this.filenames.parseFilename(i);
     });
   }

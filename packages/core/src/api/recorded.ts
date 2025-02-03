@@ -10,27 +10,33 @@ export interface IRecordedFilesApi {
 
 function buildQuery(params: RecordedFilesQuery) {
   return JSON.stringify({
-    query: `{
-      previousRuns(rangeStart: ${params.rangeStart}, rangeEnd: ${params.rangeEnd}) {
+    query: `query PreviousRuns($rangeStart: Int, $rangeEnd: Int){
+      previousRuns(rangeStart: $rangeStart, rangeEnd: $rangeEnd) {
         filename,
         date,
         packetLen,
         trackId
       }
-    }`
+    }`,
+    variables: {
+      rangeStart: params.rangeStart, rangeEnd: params.rangeEnd
+    }
   })
 }
+
 export class RecordedFilesQL implements IRecordedFilesApi {
+
   async getAllPreviousRuns(): Promise<ApiResponse<RecordedFile[]>> {
     const api = usingAxios();
     const response = await api.post(
       `${HttpRoutes.baseUrl}${HttpRoutes.recordedFilesQL}`,
-      buildQuery({rangeEnd: 0, rangeStart: 0})
+      buildQuery({ rangeEnd: 0, rangeStart: 0 })
     )
     return {
-      data: response.data
+      data: response.data.data.previousRuns
     }
   }
+
   async getAllPreviousRest(): Promise<ApiResponse<RecordedFile[]>> {
     const api = usingAxios();
     const model: RecordedFilesQuery = {
