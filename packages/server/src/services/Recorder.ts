@@ -9,6 +9,7 @@ import { FilenameUtils } from '../utilities/Filename.js';
 import { ForzaTelemetryApi } from 'ForzaTelemetryApi';
 
 export interface IRecordData {
+  isRecording: boolean;
   initialize(): Promise<void>;
   setRecording(state: boolean): void;
   getAllRecordings(): Promise<RecordedFile[]>;
@@ -20,11 +21,11 @@ export class ForzaDataRecorder implements IRecordData {
   private config: IRecordDataConfig;
   private fileWriter: IFileWriter;
   private recordingTrackId?: number;
-  private doRecord: boolean;
+  isRecording: boolean;
 
   constructor(config: IRecordDataConfig) {
     this.config = config;
-    this.doRecord = false;
+    this.isRecording = false;
     this.fileWriter = new FileWriter();
   }
 
@@ -43,17 +44,17 @@ export class ForzaDataRecorder implements IRecordData {
   }
 
   private startRecording(): void {
-    if (this.doRecord) {
+    if (this.isRecording) {
       console.warn(`Already recording ${this.recordingTrackId}`);
       return;
     }
-    this.doRecord = true;
+    this.isRecording = true;
   }
 
   private stopRecording(): void {
     this.fileWriter.end();
     this.recordingTrackId = undefined;
-    this.doRecord = false;
+    this.isRecording = false;
   }
 
   async getAllRecordings(): Promise<RecordedFile[]> {
@@ -73,7 +74,7 @@ export class ForzaDataRecorder implements IRecordData {
 
   maybeWritePacket(buffer: Buffer<ArrayBufferLike>): void {
     const packet = new ForzaTelemetryApi(buffer.byteLength, buffer);
-    if (!packet.isRaceOn || !this.doRecord) {
+    if (!packet.isRaceOn || !this.isRecording) {
       return;
     }
     if (!this.recordingTrackId) {
