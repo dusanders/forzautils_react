@@ -1,9 +1,10 @@
 import React, { createContext, ReactElement, useContext, useEffect, useRef, useState } from "react";
-import { ForzaDataEvent, ForzaWebsocket } from "@forzautils/core";
+import { ForzaDataEvent, ForzaWebsocket, PlaybackRequest } from "@forzautils/core";
 
 export interface IForzaData {
   isWebsocketOpen: boolean;
-  packet?: ForzaDataEvent
+  packet?: ForzaDataEvent;
+  requestPlayback(request: PlaybackRequest): void;
 }
 
 export interface ForzaContextProps {
@@ -16,7 +17,7 @@ export function ForzaContext(props: ForzaContextProps) {
   const ws = ForzaWebsocket.Open();
   const packetRef = useRef<ForzaDataEvent>();
   const [isWSOpen, setIsWSOpen] = useState(false);
-  const [packet, setPacket] = useState<ForzaDataEvent|undefined>();
+  const [packet, setPacket] = useState<ForzaDataEvent | undefined>();
   useEffect(() => {
     const openSub = ws.on('open', () => {
       setIsWSOpen(true);
@@ -41,7 +42,10 @@ export function ForzaContext(props: ForzaContextProps) {
   return (
     <forza_context.Provider value={{
       packet: packet,
-      isWebsocketOpen: isWSOpen
+      isWebsocketOpen: isWSOpen,
+      requestPlayback: (request) => {
+
+      }
     }}>
       <forza_context.Consumer>
         {context => props.children(context)}
@@ -50,6 +54,6 @@ export function ForzaContext(props: ForzaContextProps) {
   )
 }
 
-export function useForzaData(){
+export function useForzaData() {
   return useContext(forza_context);
 }

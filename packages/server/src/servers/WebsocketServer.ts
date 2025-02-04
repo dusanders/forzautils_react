@@ -3,9 +3,11 @@ import { IWebsocketServerConfig } from "../types/ServerConfig.js";
 import { IWebsocketServer } from "../types/Server.js";
 import { WebsocketHub } from "../sockets/WebsocketHub.js";
 import { ISubscribeUdpEvents, UdpEventSubscription } from "../types/ForzaUdpTypes.js";
-import { WebsocketRoutes, SocketTopics, WebsocketUtils } from "@forzautils/core"
+import { WebsocketRoutes, SocketTopics, WebsocketRequestValidator, ServerMessage } from "@forzautils/core"
 import { IWebsocketInfo } from "../types/WebsocketInfo.js";
 import { ByteEncoder } from "../utilities/ByteEncoder.js";
+import { ReplayWebsocket } from "../sockets/ReplaySocket.js";
+import { IRecordData } from "../services/Recorder.js";
 
 export class WebsocketServer implements IWebsocketServer {
   private config: IWebsocketServerConfig;
@@ -13,14 +15,18 @@ export class WebsocketServer implements IWebsocketServer {
   private hub: WebsocketHub;
   private forzaUdp: ISubscribeUdpEvents;
   private forzaSubscription?: UdpEventSubscription;
+  private recorder: IRecordData;
 
-  constructor(config: IWebsocketServerConfig, updSocket: ISubscribeUdpEvents) {
+  constructor(config: IWebsocketServerConfig,
+    updSocket: ISubscribeUdpEvents,
+    recorder: IRecordData) {
     this.config = config;
     this.wsApp = App();
     this.hub = new WebsocketHub({
       onIncomingMessage: this.handleIncomingMessage.bind(this)
     });
     this.forzaUdp = updSocket;
+    this.recorder = recorder;
   }
 
   start() {
@@ -43,7 +49,16 @@ export class WebsocketServer implements IWebsocketServer {
   }
 
   private handleIncomingMessage(socket: WebSocket<IWebsocketInfo>, data: ArrayBuffer) {
-      console.log(`${JSON.stringify(socket.getUserData())} - ${ByteEncoder.decode(data)}`);
+    const request = JSON.parse(ByteEncoder.decode(data));
+    if (WebsocketRequestValidator.isPlaybackRequest(request)) {
+      const replaySocket = new ReplayWebsocket(socket);
+      replaySocket.replay(this.recorder.playback(request.filename));
+    } else if(WebsocketRequestValidator.isSetRecordingRequest(request)) {
+      this.recorder.setRecording(request.record);
+    }
+    else {
+      console.log(`Unknown request message: ${ByteEncoder.decode(data)}`);
+    }
   }
 
   private setupFozaUdp() {
@@ -53,13 +68,14 @@ export class WebsocketServer implements IWebsocketServer {
   }
 
   private sendPacket(bytes: Buffer<ArrayBufferLike>): void {
-    const buffer = Buffer.from([
-      WebsocketUtils.topicToByte(SocketTopics.LiveData),
-      ...bytes
-    ]);
+    const message: ServerMessage = {
+      topic: SocketTopics.LiveData,
+      data: bytes
+    };
+    this.recorder.maybeWritePacket(bytes);
     this.wsApp.publish(
       SocketTopics.LiveData,
-      buffer,
+      ByteEncoder.encode(JSON.stringify(message)),
       true
     );
   }

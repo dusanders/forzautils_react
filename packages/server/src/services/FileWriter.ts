@@ -1,4 +1,3 @@
-import { ForzaTelemetryApi } from 'ForzaTelemetryApi';
 import FS from 'fs-extra';
 
 export interface IFileWriter {
@@ -19,7 +18,7 @@ export class FileWriter implements IFileWriter {
   }
 
   append(packet: Buffer<ArrayBufferLike>): void {
-    if(!this.writeStream) {
+    if (!this.writeStream) {
       throw new Error('Must open file before appending data!');
     }
     this.packetBuff.push(packet);
@@ -27,7 +26,7 @@ export class FileWriter implements IFileWriter {
   }
 
   end(): void {
-    while(this.packetBuff.length) {
+    while (this.packetBuff.length) {
       this.drain();
     }
     this.writeStream?.end();
@@ -38,15 +37,8 @@ export class FileWriter implements IFileWriter {
 
   private drain() {
     const chunk = this.packetBuff.shift();
-    if(chunk) {
-      // We know the race flag is the first Int in the buffer,
-      //// check the source for ForzaTelemetryApi
-      const isRaceOn = chunk.readInt32LE() === 1;
-      if(!isRaceOn) {
-        console.log(`Skipping packet - race NOT running`);
-        return;
-      }
-      if(!this.writeStream?.write(chunk)) {
+    if (chunk) {
+      if (!this.writeStream?.write(chunk)) {
         console.warn(`!!!! FILE BUFFER IS OVERFLOWING - WAIT FOR DRAIN !!!!`);
         this.writeStream?.once('drain', () => {
           this.drain();

@@ -24,8 +24,9 @@ class Server {
     this.config = config;
     this.forzaUdpListener = new IncomingUdpListener();
     this.expressServer = new ExpressServer(this.config);
-    this.websocketServer = new WebsocketServer(this.config, this.forzaUdpListener);
-    this.dataRecorder = new ForzaDataRecorder(this.config, this.forzaUdpListener);
+    this.dataRecorder = new ForzaDataRecorder(this.config);
+    this.websocketServer = new WebsocketServer(this.config, 
+      this.forzaUdpListener, this.dataRecorder);
   }
 
   async start() {

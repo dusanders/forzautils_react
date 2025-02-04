@@ -1,6 +1,13 @@
+import { ForzaTelemetryApi } from "ForzaTelemetryApi";
+
 export enum SocketTopics {
   LiveData = 'forza-data',
   Playback = 'replay-data'
+}
+
+export interface ServerMessageMap {
+  'forza-data': ForzaTelemetryApi;
+  'replay-data': ForzaTelemetryApi;
 }
 
 export class WebsocketUtils {

@@ -6,7 +6,7 @@ export interface RecordedFilesQuery {
 
 export interface RecordedFile {
   filename: string;
-  date: string;
-  packetLen: string;
+  date: number;
+  packetLen: number;
   trackId: string;
 }

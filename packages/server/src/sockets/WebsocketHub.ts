@@ -1,6 +1,5 @@
 import { DISABLED, HttpRequest, HttpResponse, us_socket_context_t, WebSocket, WebSocketBehavior } from "uWebSockets.js";
 import { IWebsocketInfo } from "../types/WebsocketInfo.js";
-import { ByteEncoder } from "../utilities/ByteEncoder.js";
 import { SocketTopics } from "@forzautils/core";
 
 export interface WebsocketHubDependency {
