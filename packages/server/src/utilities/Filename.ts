@@ -9,7 +9,7 @@ export class FilenameUtils {
     return {
       filename: filename,
       packetLen: Number.parseInt(segments[2]),
-      trackId: segments[1],
+      trackId: Number.parseInt(segments[1]),
       date: Number.parseInt(segments[0])
     }
   }

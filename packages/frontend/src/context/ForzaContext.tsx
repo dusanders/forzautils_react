@@ -39,9 +39,7 @@ export function ForzaContext(props: ForzaContextProps) {
       setPacket(packetRef.current);
     }, 100);
     const replayThrottle = setInterval(() => {
-      if(replayPacketRef.current) {
-        setReplay(replayPacketRef.current);
-      }
+      setReplay(replayPacketRef.current);
     }, 100);
     ws.start();
     return () => {

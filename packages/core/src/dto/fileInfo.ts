@@ -8,5 +8,5 @@ export interface RecordedFile {
   filename: string;
   date: number;
   packetLen: number;
-  trackId: string;
+  trackId: number;
 }

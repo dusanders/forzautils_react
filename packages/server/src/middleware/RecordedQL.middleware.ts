@@ -2,16 +2,16 @@ import { Application, Handler } from "express";
 import { IMiddleware } from "../types/Middleware.js";
 import { HttpRoutes, RecordedFilesQuery } from "@forzautils/core";
 import { createHandler } from "graphql-http/lib/use/express";
-import { buildSchema, GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
+import { buildSchema, GraphQLFloat, GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import { IRecordData } from "../services/Recorder.js";
 
 const recordedFile_schema = new GraphQLObjectType({
   name: 'RecordedFile',
   fields: {
     filename: { type: GraphQLString },
-    date: { type: GraphQLString },
-    packetLen: { type: GraphQLString },
-    trackId: { type: GraphQLString }
+    date: { type: GraphQLFloat },
+    packetLen: { type: GraphQLInt },
+    trackId: { type: GraphQLInt }
   }
 });
 
@@ -54,7 +54,7 @@ export class RecorderQLMiddleware implements IMiddleware {
   private async getAllFiles() {
     const all = await this.recorder.getAllRecordings();
     all.push({
-      trackId: '0',
+      trackId: 0,
       date: Date.now(),
       packetLen: 331,
       filename: 'name'
