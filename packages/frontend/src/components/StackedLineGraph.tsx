@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Chart, ChartDataset, registerables } from 'chart.js';
 import { Line } from "react-chartjs-2";
 import { useScreenDimensions } from "../hooks/useScreenDimensions";
@@ -19,20 +19,24 @@ export function StackedLineGraph(props: StackedLineGraphProps) {
   const labels = props.data
     ? props.data[0].data.map(i => '')
     : [];
+
   return (
-    <div>
+    <div className={`relative flex flex-col mt-2 content-center items-center`}
+      style={{
+        height: `${Math.round(size.dimensions.innerHeight * 0.3)}px`,
+        width: `${Utils.getGraphWidth(size.dimensions.innerWidth)}px`
+      }}>
       <Line
-        ref={props.ref}
-        className="mt-2"
         id={Utils.randomKey()}
         style={{
           backgroundColor: theme.colors.charts.line.background,
-          borderRadius: 6
+          borderRadius: 6,
+          height: '100%',
+          width: '100%'
         }}
-        height={size.dimensions.innerHeight * 0.3}
-        width={Utils.getGraphWidth(size.dimensions.innerWidth)}
         options={{
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
+          responsive: true,
           spanGaps: true,
           elements: {
             point: {

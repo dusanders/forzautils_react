@@ -8,6 +8,7 @@ import { useTheme } from "../context/Theme";
 import { useScreenDimensions } from "../hooks/useScreenDimensions";
 import { StackedLineGraph } from "./StackedLineGraph";
 import { useForzaData } from "../context/ForzaContext";
+import { Utils } from "../utility/Utils";
 
 export interface TireInfoProps {
 
@@ -40,7 +41,7 @@ export function TireInfo(props: TireInfoProps) {
   const [state, setState] = useState<TireInfoState>(initialState);
 
   useEffect(() => {
-    if(!forza.packet || !forza.packet.data.isRaceOn) {
+    if (!forza.packet || !forza.packet.data.isRaceOn) {
       return;
     }
     setState({
@@ -77,112 +78,117 @@ export function TireInfo(props: TireInfoProps) {
         title={(<CardTitle title="Tire Information" />)}
         body={(
           <>
-            <Bar
-              style={{
-                backgroundColor: theme.colors.charts.line.background,
-                borderRadius: 6
-              }}
-              height={size.dimensions.innerHeight * 0.25}
-              options={{
-                maintainAspectRatio: true,
-                elements: {
-                  point: {
-                    pointStyle: false,
-                    radius: 0
-                  },
-                  line: {
-                    tension: 0.3
-                  }
-                },
-                scales: {
-                  y: {
-                    ticks: {
-                      color: theme.colors.charts.line.valueLabel
+            <div className={`relative`} style={{
+              height: `${Math.round(size.dimensions.innerHeight * 0.25)}px`,
+              width: `${Utils.getGraphWidth(size.dimensions.innerWidth)}px`
+            }}>
+              <Bar
+                style={{
+                  backgroundColor: theme.colors.charts.line.background,
+                  borderRadius: 6
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  elements: {
+                    point: {
+                      pointStyle: false,
+                      radius: 0
                     },
-                    grid: {
-                      display: false
-                    }
-                  }
-                },
-                plugins: {
-                  title: {
-                    display: true,
-                    text: 'TIRE TEMP',
-                    color: theme.colors.charts.line.valueLabel,
-                    font: {
-                      size: 18,
-
+                    line: {
+                      tension: 0.3
                     }
                   },
-                  tooltip: {
-                    enabled: false
+                  scales: {
+                    y: {
+                      ticks: {
+                        color: theme.colors.charts.line.valueLabel
+                      },
+                      grid: {
+                        display: false
+                      }
+                    }
                   },
-                  legend: {
-                    labels: {
-                      boxWidth: 18,
-                      useBorderRadius: true,
-                      borderRadius: 2,
+                  plugins: {
+                    title: {
+                      display: true,
+                      text: 'TIRE TEMP',
                       color: theme.colors.charts.line.valueLabel,
                       font: {
-                        size: 18
+                        size: 18,
+
+                      }
+                    },
+                    tooltip: {
+                      enabled: false
+                    },
+                    legend: {
+                      labels: {
+                        boxWidth: 18,
+                        useBorderRadius: true,
+                        borderRadius: 2,
+                        color: theme.colors.charts.line.valueLabel,
+                        font: {
+                          size: 18
+                        }
                       }
                     }
                   }
+                }}
+                data={{
+                  labels: state.leftFrontTemp.data.map(i => ''),
+                  datasets: [
+                    {
+                      label: 'Left Front',
+                      data: state.leftFrontTemp.data,
+                      backgroundColor: theme.colors.charts.leftFrontColor
+                    },
+                    {
+                      label: 'Right Front',
+                      data: state.rightFrontTemp.data,
+                      backgroundColor: theme.colors.charts.rightFrontColor
+                    },
+                    {
+                      label: 'Left Rear',
+                      data: state.leftRearTemp.data,
+                      backgroundColor: theme.colors.charts.leftRearColor
+                    },
+                    {
+                      label: 'Right Rear',
+                      data: state.rightRearTemp.data,
+                      backgroundColor: theme.colors.charts.rightRearColor
+                    }
+                  ]
+                }} />
+            </div>
+            <StackedLineGraph
+              title="SLIP ANGLE"
+              data={[
+                {
+                  label: 'Left Front',
+                  data: state.leftFrontSlip.data,
+                  backgroundColor: theme.colors.charts.leftFrontColor,
+                  borderColor: theme.colors.charts.leftFrontColor
+                },
+                {
+                  label: 'Right Front',
+                  data: state.rightFrontSlip.data,
+                  backgroundColor: theme.colors.charts.rightFrontColor,
+                  borderColor: theme.colors.charts.rightFrontColor
+                },
+                {
+                  label: 'Left Rear',
+                  data: state.leftRearSlip.data,
+                  backgroundColor: theme.colors.charts.leftRearColor,
+                  borderColor: theme.colors.charts.leftRearColor
+                },
+                {
+                  label: 'Right Rear',
+                  data: state.rightRearSlip.data,
+                  backgroundColor: theme.colors.charts.rightRearColor,
+                  borderColor: theme.colors.charts.rightRearColor
                 }
-              }}
-              data={{
-                labels: state.leftFrontTemp.data.map(i => ''),
-                datasets: [
-                  {
-                    label: 'Left Front',
-                    data: state.leftFrontTemp.data,
-                    backgroundColor: theme.colors.charts.leftFrontColor
-                  },
-                  {
-                    label: 'Right Front',
-                    data: state.rightFrontTemp.data,
-                    backgroundColor: theme.colors.charts.rightFrontColor
-                  },
-                  {
-                    label: 'Left Rear',
-                    data: state.leftRearTemp.data,
-                    backgroundColor: theme.colors.charts.leftRearColor
-                  },
-                  {
-                    label: 'Right Rear',
-                    data: state.rightRearTemp.data,
-                    backgroundColor: theme.colors.charts.rightRearColor
-                  }
-                ]
-              }} />
-            <StackedLineGraph 
-            title="SLIP ANGLE"
-            data={[
-              {
-                label: 'Left Front',
-                data: state.leftFrontSlip.data,
-                backgroundColor: theme.colors.charts.leftFrontColor,
-                borderColor: theme.colors.charts.leftFrontColor
-              },
-              {
-                label: 'Right Front',
-                data: state.rightFrontSlip.data,
-                backgroundColor: theme.colors.charts.rightFrontColor,
-                borderColor: theme.colors.charts.rightFrontColor
-              },
-              {
-                label: 'Left Rear',
-                data: state.leftRearSlip.data,
-                backgroundColor: theme.colors.charts.leftRearColor,
-                borderColor: theme.colors.charts.leftRearColor
-              }, 
-              {
-                label: 'Right Rear',
-                data: state.rightRearSlip.data,
-                backgroundColor: theme.colors.charts.rightRearColor,
-                borderColor: theme.colors.charts.rightRearColor
-              }
-            ]}/>
+              ]} />
           </>
         )} />
     </Paper>
