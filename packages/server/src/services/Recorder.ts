@@ -21,6 +21,7 @@ export class ForzaDataRecorder implements IRecordData {
   private config: IRecordDataConfig;
   private fileWriter: IFileWriter;
   private recordingTrackId?: number;
+  private totalChunks: number = 0;
   isRecording: boolean;
 
   constructor(config: IRecordDataConfig) {
@@ -55,6 +56,7 @@ export class ForzaDataRecorder implements IRecordData {
     this.fileWriter.end();
     this.recordingTrackId = undefined;
     this.isRecording = false;
+    this.totalChunks = 0;
   }
 
   async getAllRecordings(): Promise<RecordedFile[]> {
@@ -96,6 +98,7 @@ export class ForzaDataRecorder implements IRecordData {
       );
     }
     if (this.fileWriter.isOpen) {
+      this.totalChunks++;
       this.fileWriter.append(buffer);
     }
   }
