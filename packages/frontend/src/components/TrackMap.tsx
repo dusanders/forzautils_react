@@ -7,6 +7,8 @@ import { CardTitle } from "./CardTitle";
 import { useScreenDimensions } from "../hooks/useScreenDimensions";
 import { Utils } from "../utility/Utils";
 import { useForzaData } from "../context/ForzaContext";
+import { FM8_CarInfo } from "@forzautils/core";
+import { FM8_trackList } from "ForzaTelemetryApi";
 
 export interface TrackMapProps {
 
@@ -25,6 +27,7 @@ interface PlayerPosition {
 interface RaceInfo {
   currentLap: number;
   currentPosition: number;
+  trackId: number;
 }
 export function TrackMap(props: TrackMapProps) {
   const xPadding: number = 10;
@@ -33,7 +36,7 @@ export function TrackMap(props: TrackMapProps) {
   const screen = useScreenDimensions();
   const forza = useForzaData();
   const [path, setPath] = useState('');
-  const [raceInfo, setRaceInfo] = useState<RaceInfo>({ currentLap: 0, currentPosition: 0 });
+  const [raceInfo, setRaceInfo] = useState<RaceInfo>({ currentLap: 0, currentPosition: 0, trackId: 111 });
   const [positions, setPositions] = useState<PlayerPosition[]>([{ x: 0, y: 0 }]);
   const [viewBox, setViewBox] = useState<ViewBoxState>({
     minX: -10,
@@ -77,10 +80,12 @@ export function TrackMap(props: TrackMapProps) {
     setPositions(updatedHistory);
     setRaceInfo({
       currentLap: forza.packet.data.lapNumber,
-      currentPosition: forza.packet.data.racePosition
+      currentPosition: forza.packet.data.racePosition,
+      trackId: forza.packet.data.trackId
     });
   }, [forza.packet]);
 
+  const trackInfo = FM8_trackList.getTrackInfo(raceInfo.trackId);
   const fontSize = (Math.abs(viewBox.maxY) / Math.abs(viewBox.minY)) * 0.3;
   return (
     <Paper rootClassName='inline-block'
@@ -88,12 +93,15 @@ export function TrackMap(props: TrackMapProps) {
       <Card
         rootClassName="h-full"
         title={(
-          <CardTitle title="Track Map" />
+          <CardTitle title={`Track Map`} />
         )}
         body={(
           <div
             id="trackmap_root"
-            className='w-full h-full place-items-center flex'>
+            className='w-full h-full place-items-center flex flex-col'>
+              <Text className="mt-[-1rem] uppercase font-bold text-center">
+                {trackInfo ? trackInfo.circuit : 'No Track Data'}
+              </Text>
             <svg height={Utils.getGraphWidth(screen.dimensions.innerWidth)}
               width={Utils.getGraphWidth(screen.dimensions.innerWidth)}
               className={`${theme.colors.background.trackMap} rounded-lg`}

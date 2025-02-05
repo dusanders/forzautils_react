@@ -1,3 +1,8 @@
+import { FM8_CarLookup, FM8Car } from "ForzaTelemetryApi";
+
+export function FM8_CarInfo(carId: number): FM8Car | undefined {
+  return FM8_CarLookup.getCarInfo(carId);
+}
 
 export function randomKey(): string {
   let

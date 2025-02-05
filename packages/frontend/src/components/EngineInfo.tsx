@@ -8,6 +8,7 @@ import { Card } from "./Card";
 import { CardTitle } from "./CardTitle";
 import { useScreenDimensions } from "../hooks/useScreenDimensions";
 import { useForzaData } from "../context/ForzaContext";
+import { FM8_CarLookup } from "ForzaTelemetryApi";
 
 export interface EngineInfoProps {
 
@@ -35,14 +36,14 @@ function HpTqCurve(props: HpTqCurveProps) {
   const hpSeries: LineSeriesType = {
     type: 'line',
     data: props.dataPoints.map(i => i.hp),
-    label: 'HP',
+    label: 'Horsepower',
     id: 'hp',
     showMark: false
   };
   const tqSeries: LineSeriesType = {
     type: 'line',
     data: props.dataPoints.map(i => i.tq),
-    label: 'TQ',
+    label: 'Torque',
     id: 'tq',
     showMark: false
   }
@@ -142,7 +143,8 @@ function HpTqCollection(props: HpTqCollectionProps) {
 
   const tabItem = (label: string, index: number) => {
     return (
-      <li className={`me-2 p-2 ${theme.colors.background.tabs.hover} ${index === activeTab ? theme.colors.background.tabs.indicator : theme.colors.background.tabs.background} rounded-b-sm cursor-pointer`}
+      <li key={Utils.randomKey()}
+        className={`me-2 p-2 ${theme.colors.background.tabs.hover} ${index === activeTab ? theme.colors.background.tabs.indicator : theme.colors.background.tabs.background} rounded-b-sm cursor-pointer`}
         onClick={() => {
           setActiveTab(index);
           setActiveChart(props.gears[index]);
@@ -177,62 +179,66 @@ interface EngineInfoState {
 }
 const initialState: EngineInfoState = {
   gearData: [
-    {gear: 1, dataPoints: [
-      {
-        rpm: 1200,
-        hp: 120,
-        tq: 80
-      },
-      {
-        rpm: 1300,
-        hp: 130,
-        tq: 90
-      },
-      {
-        rpm: 1400,
-        hp: 135,
-        tq: 110
-      },
-      {
-        rpm: 1500,
-        hp: 120,
-        tq: 125
-      },
-      {
-        rpm: 1600,
-        hp: 110,
-        tq: 135
-      }
-    ]},
-    {gear: 2, dataPoints: [
-      {
-        rpm: 3200,
-        hp: 140,
-        tq: 80
-      },
-      {
-        rpm: 3300,
-        hp: 160,
-        tq: 90
-      },
-      {
-        rpm: 3400,
-        hp: 165,
-        tq: 110
-      },
-      {
-        rpm: 3500,
-        hp: 160,
-        tq: 125
-      },
-      {
-        rpm: 3600,
-        hp: 150,
-        tq: 135
-      }
-    ]}
+    {
+      gear: 1, dataPoints: [
+        {
+          rpm: 1200,
+          hp: 120,
+          tq: 80
+        },
+        {
+          rpm: 1300,
+          hp: 130,
+          tq: 90
+        },
+        {
+          rpm: 1400,
+          hp: 135,
+          tq: 110
+        },
+        {
+          rpm: 1500,
+          hp: 120,
+          tq: 125
+        },
+        {
+          rpm: 1600,
+          hp: 110,
+          tq: 135
+        }
+      ]
+    },
+    {
+      gear: 2, dataPoints: [
+        {
+          rpm: 3200,
+          hp: 140,
+          tq: 120
+        },
+        {
+          rpm: 3300,
+          hp: 160,
+          tq: 135
+        },
+        {
+          rpm: 3400,
+          hp: 165,
+          tq: 145
+        },
+        {
+          rpm: 3500,
+          hp: 160,
+          tq: 155
+        },
+        {
+          rpm: 3600,
+          hp: 150,
+          tq: 165
+        }
+      ]
+    }
   ],
-  minRpm: 800,
+  minRpm: 0,
   maxRpm: 9000,
   currentRpm: 0,
   gear: 0,
@@ -246,7 +252,7 @@ export function EngineInfo(props: EngineInfoProps) {
   // Don't add duplicates - update existing data points
   const addOrUpdateDataPoint = () => {
     const gearIndex = forza.packet!.data.gear - 1;
-    if(gearIndex >= engineInfo.gearData.length) {
+    if (gearIndex >= engineInfo.gearData.length) {
       engineInfo.gearData.push({ gear: forza.packet!.data.gear, dataPoints: [] });
     }
     const gearData = engineInfo.gearData[gearIndex];
@@ -271,7 +277,7 @@ export function EngineInfo(props: EngineInfoProps) {
   // Check if we are in decel situation
   const isDecel = () => {
     const gearIndex = forza.packet!.data.gear - 1;
-    if(gearIndex >= engineInfo.gearData.length) {
+    if (gearIndex >= engineInfo.gearData.length) {
       return false;
     }
     const dataPoints = engineInfo.gearData[gearIndex].dataPoints;
@@ -284,11 +290,11 @@ export function EngineInfo(props: EngineInfoProps) {
   }
 
   useEffect(() => {
-    if (!forza.packet || !forza.packet.data.isRaceOn || forza.packet.data.gear === 0 
+    if (!forza.packet || !forza.packet.data.isRaceOn || forza.packet.data.gear === 0
       || !isRpmStep() || isDecel()) {
       return;
     }
-    
+
     setEngineInfo({
       gearData: addOrUpdateDataPoint(),
       minRpm: forza.packet.data.rpmData.idle,
@@ -299,24 +305,28 @@ export function EngineInfo(props: EngineInfoProps) {
     })
   }, [forza.packet]);
 
+  const carInfo = FM8_CarLookup.getCarInfo(forza.packet?.data.carInfo.ordinalId || 2235);
+
   return (
     <Paper innerClassName="justify-between flex flex-col h-full">
       <Card
         title={(
-          <CardTitle title="Engine Information" />
+          <CardTitle title={`Engine Information - ${carInfo ? carInfo.name : 'Unknown Car'}`}/>
         )}
         body={(
           <>
             <div className="flex mb-4 justify-evenly">
               <LabeledGauge
                 label="RPM"
-                value={engineInfo.currentRpm || (engineInfo.maxRpm * 0.3)}
+                value={engineInfo.currentRpm}
                 min={engineInfo.minRpm}
                 max={engineInfo.maxRpm} />
               <GearDisplay gear={engineInfo.gear} />
               <LabeledGauge
                 label="Throttle"
-                value={engineInfo.throttle || 90} />
+                value={engineInfo.throttle}
+                min={0}
+                max={100} />
             </div>
             <HpTqCollection
               gears={engineInfo.gearData} />

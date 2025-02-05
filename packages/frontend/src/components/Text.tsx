@@ -20,19 +20,19 @@ export function Text(props: TextProps) {
   switch (props.element) {
     case 'h1':
       return (
-        <h1  {...props} className={`${color} ${props.className}`}>
+        <h1  {...props} className={`${color} cursor-default ${props.className}`}>
           {props.children}
         </h1>
       );
     case 'h2':
       return (
-        <h2 {...props} className={`${color} ${props.className}`}>
+        <h2 {...props} className={`${color} cursor-default ${props.className}`}>
           {props.children}
         </h2>
       )
   }
   return (
-    <p  {...props} className={`${color} ${props.className}`}>
+    <p  {...props} className={`${color} cursor-default ${props.className}`}>
       {props.children}
     </p>
   )
