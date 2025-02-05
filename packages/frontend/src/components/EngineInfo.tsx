@@ -13,6 +13,11 @@ export interface EngineInfoProps {
 
 }
 
+interface GearData {
+  gear: number;
+  dataPoints: RpmDataPoint[];
+}
+
 interface RpmDataPoint {
   rpm: number;
   hp: number;
@@ -127,8 +132,43 @@ function LabeledGauge(props: LabeledGaugeProps) {
   )
 }
 
+interface HpTqCollectionProps {
+  gears: GearData[];
+}
+function HpTqCollection(props: HpTqCollectionProps) {
+  const theme = useTheme();
+  const [activeTab, setActiveTab] = useState(0);
+  const [activeChart, setActiveChart] = useState<GearData>(props.gears[0]);
+
+  const tabItem = (label: string, index: number) => {
+    return (
+      <li className={`me-2 p-2 ${theme.colors.background.tabs.hover} ${index === activeTab ? theme.colors.background.tabs.indicator : theme.colors.background.tabs.background} rounded-b-sm cursor-pointer`}
+        onClick={() => {
+          setActiveTab(index);
+          setActiveChart(props.gears[index]);
+        }}>
+        <Text className={`cursor-pointer`}>
+          {label}
+        </Text>
+      </li>
+    )
+  }
+
+  return (
+    <div>
+      <div className={`flex w-full min-h-8 rounded-t-lg`}>
+        <HpTqCurve
+          dataPoints={activeChart.dataPoints} />
+      </div>
+      <ul className="flex flex-wrap me-2 ms-2">
+        {props.gears.map((i, index) => tabItem(`Gear ${i.gear}`, index))}
+      </ul>
+    </div>
+  )
+}
+
 interface EngineInfoState {
-  dataPoints: RpmDataPoint[];
+  gearData: GearData[];
   currentRpm: number;
   minRpm: number;
   maxRpm: number;
@@ -136,32 +176,61 @@ interface EngineInfoState {
   throttle: number;
 }
 const initialState: EngineInfoState = {
-  dataPoints: [
-    {
-      rpm: 1200,
-      hp: 120,
-      tq: 80
-    },
-    {
-      rpm: 1300,
-      hp: 130,
-      tq: 90
-    },
-    {
-      rpm: 1400,
-      hp: 135,
-      tq: 110
-    },
-    {
-      rpm: 1500,
-      hp: 120,
-      tq: 125
-    },
-    {
-      rpm: 1600,
-      hp: 110,
-      tq: 135
-    }
+  gearData: [
+    {gear: 1, dataPoints: [
+      {
+        rpm: 1200,
+        hp: 120,
+        tq: 80
+      },
+      {
+        rpm: 1300,
+        hp: 130,
+        tq: 90
+      },
+      {
+        rpm: 1400,
+        hp: 135,
+        tq: 110
+      },
+      {
+        rpm: 1500,
+        hp: 120,
+        tq: 125
+      },
+      {
+        rpm: 1600,
+        hp: 110,
+        tq: 135
+      }
+    ]},
+    {gear: 2, dataPoints: [
+      {
+        rpm: 3200,
+        hp: 140,
+        tq: 80
+      },
+      {
+        rpm: 3300,
+        hp: 160,
+        tq: 90
+      },
+      {
+        rpm: 3400,
+        hp: 165,
+        tq: 110
+      },
+      {
+        rpm: 3500,
+        hp: 160,
+        tq: 125
+      },
+      {
+        rpm: 3600,
+        hp: 150,
+        tq: 135
+      }
+    ]}
   ],
   minRpm: 800,
   maxRpm: 9000,
@@ -175,8 +244,13 @@ export function EngineInfo(props: EngineInfoProps) {
   const [engineInfo, setEngineInfo] = useState<EngineInfoState>(initialState);
 
   // Don't add duplicates - update existing data points
-  const addOrUpdateDataPoint = (dataPoints: RpmDataPoint[]) => {
-    const found = engineInfo.dataPoints.find((i) => i.rpm === forza.packet?.data.rpmData.current);
+  const addOrUpdateDataPoint = () => {
+    const gearIndex = forza.packet!.data.gear - 1;
+    if(gearIndex >= engineInfo.gearData.length) {
+      engineInfo.gearData.push({ gear: forza.packet!.data.gear, dataPoints: [] });
+    }
+    const gearData = engineInfo.gearData[gearIndex];
+    const found = gearData.dataPoints.find((i) => i.rpm === forza.packet?.data.rpmData.current);
     if (found) {
       if (found.hp < forza.packet!.data.getHorsepower()) {
         found.hp = forza.packet!.data.getHorsepower();
@@ -185,17 +259,22 @@ export function EngineInfo(props: EngineInfoProps) {
         found.tq = forza.packet!.data.torque;
       }
     } else {
-      dataPoints.push({
+      gearData.dataPoints.push({
         rpm: Math.round(forza.packet!.data.rpmData.current),
         hp: forza.packet!.data.getHorsepower(),
         tq: forza.packet!.data.torque
       });
     }
-    return dataPoints;
+    return [...engineInfo.gearData];
   }
 
   // Check if we are in decel situation
-  const isDecel = (dataPoints: RpmDataPoint[]) => {
+  const isDecel = () => {
+    const gearIndex = forza.packet!.data.gear - 1;
+    if(gearIndex >= engineInfo.gearData.length) {
+      return false;
+    }
+    const dataPoints = engineInfo.gearData[gearIndex].dataPoints;
     return forza.packet!.data.rpmData.current < dataPoints[dataPoints.length - 1].rpm
   }
 
@@ -205,19 +284,13 @@ export function EngineInfo(props: EngineInfoProps) {
   }
 
   useEffect(() => {
-    if (!forza.packet || !forza.packet.data.isRaceOn
-      || !isRpmStep() || isDecel(engineInfo.dataPoints)) {
+    if (!forza.packet || !forza.packet.data.isRaceOn || forza.packet.data.gear === 0 
+      || !isRpmStep() || isDecel()) {
       return;
     }
-    let dataPoints = [...engineInfo.dataPoints];
-    // Reset the HP/TQ data points if we are in a new gear
-    if (forza.packet.data.gear !== engineInfo.gear) {
-      dataPoints = [];
-    } else {
-      dataPoints = addOrUpdateDataPoint(dataPoints);
-    }
+    
     setEngineInfo({
-      dataPoints: dataPoints,
+      gearData: addOrUpdateDataPoint(),
       minRpm: forza.packet.data.rpmData.idle,
       maxRpm: forza.packet.data.rpmData.max,
       currentRpm: Math.round(forza.packet.data.rpmData.current),
@@ -245,8 +318,8 @@ export function EngineInfo(props: EngineInfoProps) {
                 label="Throttle"
                 value={engineInfo.throttle || 90} />
             </div>
-            <HpTqCurve
-              dataPoints={engineInfo.dataPoints} />
+            <HpTqCollection
+              gears={engineInfo.gearData} />
           </>
         )} />
     </Paper>

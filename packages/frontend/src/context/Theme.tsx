@@ -39,6 +39,11 @@ export interface IColorElements {
     secondary: string;
     cardSeparator: string;
     trackMap: string;
+    tabs: {
+      background: string;
+      indicator: string;
+      hover: string;
+    }
   }
 }
 
@@ -73,7 +78,12 @@ const themecolors: IColorElements = {
     primary: "bg-sky-200 dark:bg-slate-950",
     secondary: "bg-sky-600 dark:bg-slate-700",
     cardSeparator: "bg-sky-600 dark:bg-sky-600/50",
-    trackMap: "bg-sky-200/50 dark:bg-slate-950/50"
+    trackMap: "bg-sky-200/50 dark:bg-slate-950/50",
+    tabs: {
+      background: "bg-sky-650 dark:bg-slate-600",
+      indicator: "bg-sky-700 dark:bg-sky-600",
+      hover: "hover:bg-sky-700 hover:dark:bg-sky-600"
+    }
   },
   dataStatus: {
     connected: 'bg-lime-300',
