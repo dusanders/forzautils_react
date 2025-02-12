@@ -130,3 +130,6 @@ dist
 .pnp.*
 /.vscode
 ./packages/server/recordings
+**/**/.DS_Store
+packages/.DS_Store
+/packages/server/recordings
