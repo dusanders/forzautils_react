@@ -166,11 +166,16 @@ export class ForzaWebsocket implements IForzaWebsocket {
       this.emit('close', ev);
     }
     this.ws.onmessage = (ev: MessageEvent<ArrayBuffer>) => {
-      const message = JSON.parse(new TextDecoder().decode(ev.data)) as ServerMessage;
+      const message = JSON.parse(new TextDecoder().decode(ev.data), (key: string, value: any) =>{
+        if(value && value.type === 'Uint8Array') {
+          return new Uint8Array(value.data);
+        }
+        return value;
+      }) as ServerMessage;
       switch (message.topic) {
         case SocketTopics.LiveData:
-          const liveBuffer = message.data as ArrayBuffer;
-          this.emit('data', { data: new ForzaTelemetryApi(liveBuffer.byteLength, liveBuffer) });
+          const liveBuffer = message.data as Uint8Array;
+          this.emit('data', { data: new ForzaTelemetryApi(liveBuffer.byteLength, liveBuffer.buffer) });
           break;
         case SocketTopics.Playback:
           const replayBuffer = message.data as ArrayBuffer;

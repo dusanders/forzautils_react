@@ -2,7 +2,7 @@ import { RecordedFile } from "@forzautils/core";
 
 export class FilenameUtils {
   static getFilename(trackId: number, packetLen: number): string {
-    return `${Date.now}:${trackId}:${packetLen}`;
+    return `${Date.now()}:${trackId}:${packetLen}`;
   }
   static parseFilename(filename: string): RecordedFile {
     const segments = filename.split(':');

@@ -70,12 +70,17 @@ export class WebsocketServer implements IWebsocketServer {
   private sendPacket(bytes: Buffer<ArrayBufferLike>): void {
     const message: ServerMessage = {
       topic: SocketTopics.LiveData,
-      data: bytes
+      data: new Uint8Array(bytes)
     };
     this.recorder.maybeWritePacket(bytes);
     this.wsApp.publish(
       SocketTopics.LiveData,
-      ByteEncoder.encode(JSON.stringify(message)),
+      ByteEncoder.encode(JSON.stringify(message, (key, value) => {
+        if(value instanceof Uint8Array) {
+          return {type: 'Uint8Array', data: Array.from(value)};
+        }
+        return value;
+      })),
       true
     );
   }

@@ -68,63 +68,57 @@ export function Suspension(props: SuspensionProps) {
   }, [forza.packet]);
 
   return (
-    <Paper innerClassName="justify-between flex flex-col h-full">
-      <Card
-        title={(<CardTitle title="Suspension" />)}
-        body={(
-          <>
-            <StackedLineGraph
-              title="SUSPENSION TRAVEL"
-              data={[
-                {
-                  label: 'Left Front',
-                  data: state.leftFront.data,
-                  borderColor: theme.colors.charts.leftFrontColor,
-                  backgroundColor: theme.colors.charts.leftFrontColor
-                },
-                {
-                  label: 'Right Front',
-                  data: state.rightFront.data,
-                  borderColor: theme.colors.charts.rightFrontColor,
-                  backgroundColor: theme.colors.charts.rightFrontColor
-                },
-                {
-                  label: 'Left Rear',
-                  data: state.leftRear.data,
-                  borderColor: theme.colors.charts.leftRearColor,
-                  backgroundColor: theme.colors.charts.leftRearColor
-                },
-                {
-                  label: 'Right Rear',
-                  data: state.rightRear.data,
-                  borderColor: theme.colors.charts.rightRearColor,
-                  backgroundColor: theme.colors.charts.rightRearColor
-                }
-              ]} />
-            <StackedLineGraph
-              title="CHASSIS ANGLE"
-              data={[
-                {
-                  label: 'Yaw',
-                  data: state.yaw.data,
-                  borderColor: theme.colors.charts.yawColor,
-                  backgroundColor: theme.colors.charts.yawColor
-                },
-                {
-                  label: 'Pitch',
-                  data: state.pitch.data,
-                  borderColor: theme.colors.charts.pitchColor,
-                  backgroundColor: theme.colors.charts.pitchColor
-                },
-                {
-                  label: 'Roll',
-                  data: state.roll.data,
-                  borderColor: theme.colors.charts.rollColor,
-                  backgroundColor: theme.colors.charts.rollColor
-                }
-              ]} />
-          </>
-        )} />
-    </Paper>
+    <div className="justify-evenly">
+      <StackedLineGraph
+        title="SUSPENSION TRAVEL"
+        data={[
+          {
+            label: 'Left Front',
+            data: state.leftFront.data,
+            borderColor: theme.colors.charts.leftFrontColor,
+            backgroundColor: theme.colors.charts.leftFrontColor
+          },
+          {
+            label: 'Right Front',
+            data: state.rightFront.data,
+            borderColor: theme.colors.charts.rightFrontColor,
+            backgroundColor: theme.colors.charts.rightFrontColor
+          },
+          {
+            label: 'Left Rear',
+            data: state.leftRear.data,
+            borderColor: theme.colors.charts.leftRearColor,
+            backgroundColor: theme.colors.charts.leftRearColor
+          },
+          {
+            label: 'Right Rear',
+            data: state.rightRear.data,
+            borderColor: theme.colors.charts.rightRearColor,
+            backgroundColor: theme.colors.charts.rightRearColor
+          }
+        ]} />
+      <StackedLineGraph
+        title="CHASSIS ANGLE"
+        data={[
+          {
+            label: 'Yaw',
+            data: state.yaw.data,
+            borderColor: theme.colors.charts.yawColor,
+            backgroundColor: theme.colors.charts.yawColor
+          },
+          {
+            label: 'Pitch',
+            data: state.pitch.data,
+            borderColor: theme.colors.charts.pitchColor,
+            backgroundColor: theme.colors.charts.pitchColor
+          },
+          {
+            label: 'Roll',
+            data: state.roll.data,
+            borderColor: theme.colors.charts.rollColor,
+            backgroundColor: theme.colors.charts.rollColor
+          }
+        ]} />
+    </div>
   )
 }

@@ -46,6 +46,14 @@ export function TrackMap(props: TrackMapProps) {
   });
 
   const maybeUpdateViewBox = (newViewBox: ViewBoxState) => {
+    if (newViewBox.maxX < 0) {
+      newViewBox.maxX = (Math.abs(newViewBox.maxX) - Math.abs(newViewBox.minX)) * 2.3;
+    }
+    if (newViewBox.maxY < 0) {
+      newViewBox.maxY = (Math.abs(newViewBox.maxY) - Math.abs(newViewBox.minY)) * 2.3;
+    }
+    newViewBox.maxX = Math.abs(newViewBox.minX) * 2.01;
+    newViewBox.maxY = Math.abs(newViewBox.minY) * 2.2;
     if (newViewBox.maxX !== viewBox.maxX || newViewBox.maxY !== viewBox.maxY
       || newViewBox.minX !== viewBox.minX || newViewBox.minY !== viewBox.minY) {
       return newViewBox;
@@ -61,10 +69,11 @@ export function TrackMap(props: TrackMapProps) {
       x: forza.packet.data.position.x,
       y: forza.packet.data.position.z
     };
-    if (!positions.length) {
+    if (positions.length === 1 && positions[0].x === 0 && positions[0].y === 0) {
       setPath(`M${newPosition.x} ${newPosition.y}`);
+      positions[0] = newPosition;
     } else {
-      setPath(`${path} L${newPosition.x} ${newPosition.y}`);
+      setPath(`${path} ${positions.length < 2 ? 'L' : ''}${newPosition.x} ${newPosition.y}`);
     }
     const updatedHistory = [...positions, newPosition];
     const xPosHistory = updatedHistory.map((i) => i.x);
@@ -86,37 +95,33 @@ export function TrackMap(props: TrackMapProps) {
   }, [forza.packet]);
 
   const trackInfo = FM8_trackList.getTrackInfo(raceInfo.trackId);
-  const fontSize = (Math.abs(viewBox.maxY) / Math.abs(viewBox.minY)) * 0.3;
+  const fontSize = (Math.max(viewBox.maxY), Math.abs(viewBox.minY)) * 0.1;
   return (
-    <Paper rootClassName='inline-block'
-      innerClassName="h-full">
-      <Card
-        rootClassName="h-full"
-        title={(
-          <CardTitle title={`Track Map`} />
-        )}
-        body={(
-          <div
-            id="trackmap_root"
-            className='w-full h-full place-items-center flex flex-col'>
-              <Text className="mt-[-1rem] uppercase font-bold text-center">
-                {trackInfo ? trackInfo.circuit : 'No Track Data'}
-              </Text>
-            <svg height={Utils.getGraphWidth(screen.dimensions.innerWidth)}
-              width={Utils.getGraphWidth(screen.dimensions.innerWidth)}
-              className={`${theme.colors.background.trackMap} rounded-lg`}
-              viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.maxX} ${viewBox.maxY}`}>
-              <text fontSize={fontSize}
-                fill={theme.colors.charts.line.valueLabel}
-                x={viewBox.minX} y={viewBox.minY + fontSize}>
-                Lap: {raceInfo.currentLap} Pos: {raceInfo.currentPosition}
-              </text>
-              <path stroke={theme.colors.charts.line.axisLine} strokeWidth={1} d={path} strokeLinecap={'round'} />
-              <circle x={positions[positions.length - 1].x} y={positions[positions.length - 1].y} r={fontSize * 0.5}
-                fill={theme.colors.charts.line.indicator} />
-            </svg>
-          </div>
-        )} />
-    </Paper>
+    <div
+      className='place-items-center flex flex-col'>
+      <Text className="mt-[-1rem] uppercase font-bold text-center">
+        {trackInfo ? trackInfo.circuit : 'No Track Data'}
+      </Text>
+      <svg height={Utils.getGraphWidth(screen.dimensions.innerWidth)}
+        width={Utils.getGraphWidth(screen.dimensions.innerWidth)}
+        className={`${theme.colors.background.trackMap} rounded-lg`}
+        preserveAspectRatio="xMidYMid meet"
+        viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.maxX} ${viewBox.maxY}`}>
+        <text fontSize={fontSize}
+          fill={theme.colors.charts.line.valueLabel}
+          x={viewBox.minX} y={viewBox.minY + fontSize}>
+          Lap: {raceInfo.currentLap} Pos: {raceInfo.currentPosition}
+        </text>
+        <path stroke={theme.colors.charts.line.axisLine}
+          strokeWidth={fontSize * 0.3}
+          strokeLinecap={'round'} fill="rgba(0,0,0,0)"
+          d={path} />
+        <circle
+          cx={positions[positions.length - 1].x}
+          cy={positions[positions.length - 1].y}
+          r={fontSize * 0.5}
+          fill={theme.colors.charts.line.indicator} />
+      </svg>
+    </div>
   )
 }

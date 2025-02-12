@@ -45,12 +45,10 @@ class Server {
   }
 
   private catchProcessExit() {
-    process.on('exit',this.stopAll.bind(this));
-    process.on('SIGINT', this.stopAll.bind(this));
-    process.on('SIGUSR1', this.stopAll.bind(this));
-    process.on('SIGUSR2', this.stopAll.bind(this));
-    process.on('uncaughtException', this.stopAll.bind(this));
-    process.on('unhandledRejection', this.stopAll.bind(this));
+    // process.on('exit',this.stopAll.bind(this));
+    // process.on('SIGINT', this.stopAll.bind(this));
+    // process.on('SIGUSR1', this.stopAll.bind(this));
+    // process.on('SIGUSR2', this.stopAll.bind(this));
   }
 
   private stopAll() {

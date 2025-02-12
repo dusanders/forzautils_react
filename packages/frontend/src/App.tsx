@@ -8,6 +8,9 @@ import { Suspension } from './components/Suspension';
 import { useForzaData } from './context/ForzaContext';
 import { TireInfo } from './components/TireInfo';
 import { useRecorder } from './hooks/useRecorder';
+import { Paper } from './components/Paper';
+import { Card } from './components/Card';
+import { CardTitle } from './components/CardTitle';
 
 function App() {
   const forza = useForzaData();
@@ -22,12 +25,12 @@ function App() {
     <>
       <BackgroundLogo />
       <WifiInfo />
-      <div className='flex flex-wrap place-content-center'>
+      <Paper innerClassName='flex flex-wrap justify-evenly'>
         <TrackMap />
         <EngineInfo />
         <Suspension />
         <TireInfo />
-      </div>
+      </Paper>
     </>
   )
 }

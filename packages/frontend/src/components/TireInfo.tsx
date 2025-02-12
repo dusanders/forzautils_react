@@ -73,124 +73,118 @@ export function TireInfo(props: TireInfoProps) {
   }, [forza.packet]);
 
   return (
-    <Paper>
-      <Card
-        title={(<CardTitle title="Tire Information" />)}
-        body={(
-          <>
-            <div className={`relative`} style={{
-              height: `${Math.round(size.dimensions.innerHeight * 0.25)}px`,
-              width: `${Utils.getGraphWidth(size.dimensions.innerWidth)}px`
-            }}>
-              <Bar
-                style={{
-                  backgroundColor: theme.colors.charts.line.background,
-                  borderRadius: 6
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  elements: {
-                    point: {
-                      pointStyle: false,
-                      radius: 0
-                    },
-                    line: {
-                      tension: 0.3
-                    }
-                  },
-                  scales: {
-                    y: {
-                      ticks: {
-                        color: theme.colors.charts.line.valueLabel
-                      },
-                      grid: {
-                        display: false
-                      }
-                    }
-                  },
-                  plugins: {
-                    title: {
-                      display: true,
-                      text: 'TIRE TEMP',
-                      color: theme.colors.charts.line.valueLabel,
-                      font: {
-                        size: 18,
-
-                      }
-                    },
-                    tooltip: {
-                      enabled: false
-                    },
-                    legend: {
-                      labels: {
-                        boxWidth: 18,
-                        useBorderRadius: true,
-                        borderRadius: 2,
-                        color: theme.colors.charts.line.valueLabel,
-                        font: {
-                          size: 18
-                        }
-                      }
-                    }
-                  }
-                }}
-                data={{
-                  labels: state.leftFrontTemp.data.map(i => ''),
-                  datasets: [
-                    {
-                      label: 'Left Front',
-                      data: state.leftFrontTemp.data,
-                      backgroundColor: theme.colors.charts.leftFrontColor
-                    },
-                    {
-                      label: 'Right Front',
-                      data: state.rightFrontTemp.data,
-                      backgroundColor: theme.colors.charts.rightFrontColor
-                    },
-                    {
-                      label: 'Left Rear',
-                      data: state.leftRearTemp.data,
-                      backgroundColor: theme.colors.charts.leftRearColor
-                    },
-                    {
-                      label: 'Right Rear',
-                      data: state.rightRearTemp.data,
-                      backgroundColor: theme.colors.charts.rightRearColor
-                    }
-                  ]
-                }} />
-            </div>
-            <StackedLineGraph
-              title="SLIP ANGLE"
-              data={[
-                {
-                  label: 'Left Front',
-                  data: state.leftFrontSlip.data,
-                  backgroundColor: theme.colors.charts.leftFrontColor,
-                  borderColor: theme.colors.charts.leftFrontColor
+    <div className="justify-evenly">
+      <div className={`relative`} style={{
+        height: `${Math.round(size.dimensions.innerHeight * 0.25)}px`,
+        width: `${Utils.getGraphWidth(size.dimensions.innerWidth)}px`
+      }}>
+        <Bar
+          style={{
+            backgroundColor: theme.colors.charts.line.background,
+            borderRadius: 6
+          }}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            elements: {
+              point: {
+                pointStyle: false,
+                radius: 0
+              },
+              line: {
+                tension: 0.3
+              }
+            },
+            scales: {
+              y: {
+                ticks: {
+                  color: theme.colors.charts.line.valueLabel
                 },
-                {
-                  label: 'Right Front',
-                  data: state.rightFrontSlip.data,
-                  backgroundColor: theme.colors.charts.rightFrontColor,
-                  borderColor: theme.colors.charts.rightFrontColor
-                },
-                {
-                  label: 'Left Rear',
-                  data: state.leftRearSlip.data,
-                  backgroundColor: theme.colors.charts.leftRearColor,
-                  borderColor: theme.colors.charts.leftRearColor
-                },
-                {
-                  label: 'Right Rear',
-                  data: state.rightRearSlip.data,
-                  backgroundColor: theme.colors.charts.rightRearColor,
-                  borderColor: theme.colors.charts.rightRearColor
+                grid: {
+                  display: false
                 }
-              ]} />
-          </>
-        )} />
-    </Paper>
+              }
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: 'TIRE TEMP',
+                color: theme.colors.charts.line.valueLabel,
+                font: {
+                  size: 18,
+
+                }
+              },
+              tooltip: {
+                enabled: false
+              },
+              legend: {
+                labels: {
+                  boxWidth: 18,
+                  useBorderRadius: true,
+                  borderRadius: 2,
+                  color: theme.colors.charts.line.valueLabel,
+                  font: {
+                    size: 18
+                  }
+                }
+              }
+            }
+          }}
+          data={{
+            labels: state.leftFrontTemp.data.map(i => ''),
+            datasets: [
+              {
+                label: 'Left Front',
+                data: state.leftFrontTemp.data,
+                backgroundColor: theme.colors.charts.leftFrontColor
+              },
+              {
+                label: 'Right Front',
+                data: state.rightFrontTemp.data,
+                backgroundColor: theme.colors.charts.rightFrontColor
+              },
+              {
+                label: 'Left Rear',
+                data: state.leftRearTemp.data,
+                backgroundColor: theme.colors.charts.leftRearColor
+              },
+              {
+                label: 'Right Rear',
+                data: state.rightRearTemp.data,
+                backgroundColor: theme.colors.charts.rightRearColor
+              }
+            ]
+          }} />
+      </div>
+      <StackedLineGraph
+        title="SLIP ANGLE"
+        data={[
+          {
+            label: 'Left Front',
+            data: state.leftFrontSlip.data,
+            backgroundColor: theme.colors.charts.leftFrontColor,
+            borderColor: theme.colors.charts.leftFrontColor
+          },
+          {
+            label: 'Right Front',
+            data: state.rightFrontSlip.data,
+            backgroundColor: theme.colors.charts.rightFrontColor,
+            borderColor: theme.colors.charts.rightFrontColor
+          },
+          {
+            label: 'Left Rear',
+            data: state.leftRearSlip.data,
+            backgroundColor: theme.colors.charts.leftRearColor,
+            borderColor: theme.colors.charts.leftRearColor
+          },
+          {
+            label: 'Right Rear',
+            data: state.rightRearSlip.data,
+            backgroundColor: theme.colors.charts.rightRearColor,
+            borderColor: theme.colors.charts.rightRearColor
+          }
+        ]} />
+    </div>
   )
 }

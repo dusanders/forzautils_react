@@ -75,7 +75,8 @@ export class ForzaDataRecorder implements IRecordData {
   }
 
   maybeWritePacket(buffer: Buffer<ArrayBufferLike>): void {
-    const packet = new ForzaTelemetryApi(buffer.byteLength, buffer);
+    // console.log(`maybeWritePacket ${buffer.byteLength}`);
+    const packet = new ForzaTelemetryApi(buffer.byteLength, buffer.buffer);
     if (!packet.isRaceOn || !this.isRecording || packet.trackId === 0) {
       return;
     }

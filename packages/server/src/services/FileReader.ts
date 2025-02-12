@@ -23,6 +23,7 @@ export class FileReader implements IFileReader {
       throw new Error(`Failed to open file ${filepath} -- does not exist`);
     }
     this.stream = FS.createReadStream(filepath);
+    this.stream.pause();
   }
 
   async getNextPacket(): Promise<Buffer<ArrayBufferLike> | null> {
