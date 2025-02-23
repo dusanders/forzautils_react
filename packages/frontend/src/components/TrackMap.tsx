@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Card } from "./Card";
 import { Paper } from "./Paper";
-import { Text } from './Text';
+import { ThemeText } from './ThemeText';
 import { useTheme } from "../context/Theme";
 import { CardTitle } from "./CardTitle";
 import { useScreenDimensions } from "../hooks/useScreenDimensions";
@@ -28,6 +28,7 @@ interface RaceInfo {
   currentLap: number;
   currentPosition: number;
   trackId: number;
+  time: number;
 }
 export function TrackMap(props: TrackMapProps) {
   const xPadding: number = 10;
@@ -36,7 +37,7 @@ export function TrackMap(props: TrackMapProps) {
   const screen = useScreenDimensions();
   const forza = useForzaData();
   const [path, setPath] = useState('');
-  const [raceInfo, setRaceInfo] = useState<RaceInfo>({ currentLap: 0, currentPosition: 0, trackId: 111 });
+  const [raceInfo, setRaceInfo] = useState<RaceInfo>({ currentLap: 0, currentPosition: 0, trackId: 111, time: 0 });
   const [positions, setPositions] = useState<PlayerPosition[]>([{ x: 0, y: 0 }]);
   const [viewBox, setViewBox] = useState<ViewBoxState>({
     minX: -10,
@@ -90,7 +91,8 @@ export function TrackMap(props: TrackMapProps) {
     setRaceInfo({
       currentLap: forza.packet.data.lapNumber,
       currentPosition: forza.packet.data.racePosition,
-      trackId: forza.packet.data.trackId
+      trackId: forza.packet.data.trackId,
+      time: forza.packet.data.currentRaceTime
     });
   }, [forza.packet]);
 
@@ -98,20 +100,20 @@ export function TrackMap(props: TrackMapProps) {
   const fontSize = (Math.max(viewBox.maxY), Math.abs(viewBox.minY)) * 0.1;
   return (
     <div
-      className='place-items-center flex flex-col'>
-      <Text className="mt-[-1rem] uppercase font-bold text-center">
+      className='place-items-center flex flex-col relative'>
+      <ThemeText className="mt-[-1rem] uppercase font-bold text-center">
         {trackInfo ? trackInfo.circuit : 'No Track Data'}
-      </Text>
+      </ThemeText>
       <svg height={Utils.getGraphWidth(screen.dimensions.innerWidth)}
         width={Utils.getGraphWidth(screen.dimensions.innerWidth)}
         className={`${theme.colors.background.trackMap} rounded-lg`}
         preserveAspectRatio="xMidYMid meet"
         viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.maxX} ${viewBox.maxY}`}>
-        <text fontSize={fontSize}
+        {/* <text fontSize={fontSize}
           fill={theme.colors.charts.line.valueLabel}
           x={viewBox.minX} y={viewBox.minY + fontSize}>
           Lap: {raceInfo.currentLap} Pos: {raceInfo.currentPosition}
-        </text>
+        </text> */}
         <path stroke={theme.colors.charts.line.axisLine}
           strokeWidth={fontSize * 0.3}
           strokeLinecap={'round'} fill="rgba(0,0,0,0)"
@@ -122,6 +124,17 @@ export function TrackMap(props: TrackMapProps) {
           r={fontSize * 0.5}
           fill={theme.colors.charts.line.indicator} />
       </svg>
+      <div className="flex flex-col h-full w-full absolute">
+        <ThemeText className="text-2xl">
+          Lap: {raceInfo.currentLap}
+        </ThemeText>
+        <ThemeText className="text-2xl">
+          Position: {raceInfo.currentPosition}
+        </ThemeText>
+        <ThemeText className="text-2xl">
+          Race Time: {raceInfo.time}
+        </ThemeText>
+      </div>
     </div>
   )
 }

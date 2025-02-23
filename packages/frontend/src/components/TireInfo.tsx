@@ -73,7 +73,7 @@ export function TireInfo(props: TireInfoProps) {
   }, [forza.packet]);
 
   return (
-    <div className="justify-evenly">
+    <div className="justify-evenly mt-2">
       <div className={`relative`} style={{
         height: `${Math.round(size.dimensions.innerHeight * 0.25)}px`,
         width: `${Utils.getGraphWidth(size.dimensions.innerWidth)}px`

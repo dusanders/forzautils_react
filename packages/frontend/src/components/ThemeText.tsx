@@ -10,7 +10,7 @@ export interface TextProps extends
   onVariant?: on_theme_variant;
 }
 
-export function Text(props: TextProps) {
+export function ThemeText(props: TextProps) {
   const theme = useTheme();
   let color = theme.colors.text[
     props.variant ? props.variant : 'primary'

@@ -1,6 +1,6 @@
 import React from "react";
 import { useWifiInfo } from "../hooks/useWifiInfo";
-import { Text } from './Text';
+import { ThemeText } from './ThemeText';
 import { useTheme } from "../context/Theme";
 import { useForzaData } from "../context/ForzaContext";
 
@@ -36,9 +36,9 @@ function LabeledStatusIndicator(props: LabeledStatusIndicatorProps) {
   return (
     <div className="w-full flex flex-row">
       <BlinkDot color={props.dotColor} />
-      <Text className="uppercase font-bold text-center text-xs self-center">
+      <ThemeText className="uppercase font-bold text-center text-xs self-center">
         {props.label}
-      </Text>
+      </ThemeText>
     </div>
   )
 }
@@ -64,12 +64,12 @@ export function WifiInfo(props: WifiInfoProps) {
       </Container>
       <div className="flex flex-wrap">
         <Container>
-          <Text className="text-center uppercase font-bold text-xs ">Ip Address</Text>
-          <Text className="text-center text-xs">{wifiInfo.info?.ip}</Text>
+          <ThemeText className="text-center uppercase font-bold text-xs ">Ip Address</ThemeText>
+          <ThemeText className="text-center text-xs">{wifiInfo.info?.ip}</ThemeText>
         </Container>
         <Container>
-          <Text className="text-center uppercase font-bold text-xs">Port</Text>
-          <Text className="text-center text-xs">{wifiInfo.info?.listenPort}</Text>
+          <ThemeText className="text-center uppercase font-bold text-xs">Port</ThemeText>
+          <ThemeText className="text-center text-xs">{wifiInfo.info?.listenPort}</ThemeText>
         </Container>
       </div>
     </div>

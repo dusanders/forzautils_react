@@ -1,8 +1,11 @@
-import React, { createContext, ReactElement, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, ReactElement, useContext, useEffect, useReducer, useRef, useState } from "react";
 import { ForzaDataEvent, ForzaWebsocket, PlaybackRequest } from "@forzautils/core";
+import { LimitedArray } from "../utility/LimitedArray";
+import { StateHandler } from "../utility/types";
 
 export interface IForzaData {
   isWebsocketOpen: boolean;
+  dataWindow: LimitedArray<ForzaDataEvent>;
   packet?: ForzaDataEvent;
   replayPacket?: ForzaDataEvent;
   requestPlayback(request: PlaybackRequest): void;
@@ -18,9 +21,18 @@ export function ForzaContext(props: ForzaContextProps) {
   const ws = ForzaWebsocket.Open();
   const packetRef = useRef<ForzaDataEvent>();
   const replayPacketRef = useRef<ForzaDataEvent>();
+  const slidingWindow = useRef<LimitedArray<ForzaDataEvent>>(new LimitedArray(10, []));
   const [isWSOpen, setIsWSOpen] = useState(false);
-  const [packet, setPacket] = useState<ForzaDataEvent | undefined>();
   const [replay, setReplay] = useState<ForzaDataEvent | undefined>();
+  const [latestPacket, setLatestPacket] = useReducer<StateHandler<ForzaDataEvent | undefined>>((prev, next) => {
+    if(!next?.data || !next.data.isRaceOn) {
+      return prev;
+    }
+    return {
+      ...prev,
+      ...next
+    } as any
+  }, undefined);
   useEffect(() => {
     const openSub = ws.on('open', () => {
       ws.setRecordingState(true);
@@ -36,7 +48,11 @@ export function ForzaContext(props: ForzaContextProps) {
       replayPacketRef.current = data;
     });
     const throttleInterval = setInterval(() => {
-      setPacket(packetRef.current);
+      setLatestPacket(packetRef.current);
+      if (packetRef.current && packetRef.current.data.isRaceOn) {
+        console.log(`Adding packet to data window: ${slidingWindow.current.data.length}`);
+        slidingWindow.current = slidingWindow.current.push(packetRef.current);
+      }
     }, 100);
     const replayThrottle = setInterval(() => {
       setReplay(replayPacketRef.current);
@@ -51,12 +67,13 @@ export function ForzaContext(props: ForzaContextProps) {
       clearInterval(replayThrottle);
     }
   }, []);
-  
+
   return (
     <forza_context.Provider value={{
-      packet: packet,
+      packet: latestPacket,
       replayPacket: replay,
       isWebsocketOpen: isWSOpen,
+      dataWindow: slidingWindow.current,
       requestPlayback: (request) => {
         ws.requestReplay(request);
       }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "./Text";
+import { ThemeText } from "./ThemeText";
 
 export interface CardTitleProps {
   title: string;
@@ -7,8 +7,8 @@ export interface CardTitleProps {
 
 export function CardTitle(props: CardTitleProps) {
   return (
-    <Text element='h2' className='font-bold uppercase opacity-60'>
+    <ThemeText element='h2' className='font-bold uppercase opacity-60'>
       {props.title}
-    </Text>
+    </ThemeText>
   )
 }
