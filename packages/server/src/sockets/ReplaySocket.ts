@@ -7,20 +7,30 @@ import { Timers } from "../utilities/Timers.js";
 
 export class ReplayWebsocket {
   private ws: WebSocket<IWebsocketInfo>;
-  
+
   constructor(ws: WebSocket<IWebsocketInfo>) {
     this.ws = ws;
   }
 
   async replay(reader: IFileReader) {
-    let packet = await reader.getNextPacket();
-    while(packet) {
+    let bytes = await reader.getNextPacket();
+    while (bytes) {
       const message: ServerMessage = {
         topic: SocketTopics.Playback,
-        data: packet
+        data: new Uint8Array(bytes),
       }
-      this.ws.send(ByteEncoder.encode(JSON.stringify(message)));
-      packet = await reader.getNextPacket();
+      try {
+        this.ws.send(
+          ByteEncoder.encode(
+            ByteEncoder.encodeBinaryMessage(message)
+          ),
+          true
+        );
+      } catch (error: Error | unknown) {
+        console.warn(`Error sending REPLAY packet: ${error}`);
+        break;
+      }
+      bytes = await reader.getNextPacket();
       await Timers.delay(1000 / 60); // 60 FPS
     }
   }

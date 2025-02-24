@@ -1,3 +1,4 @@
+import { ServerMessage } from '@forzautils/core';
 import { TextEncoder, TextDecoder } from 'node:util';
 
 /**
@@ -25,5 +26,19 @@ export class ByteEncoder {
    */
   static encode(jsString: string): Uint8Array {
     return (new TextEncoder()).encode(jsString);
+  }
+
+  /**
+   * Encode a JSON message containing a Uint8Array into a string
+   * @param message Message to encode
+   * @returns 
+   */
+  static encodeBinaryMessage(message: ServerMessage) {
+    return JSON.stringify(message, (key, value) => {
+      if (value instanceof Uint8Array) {
+        return { type: 'Uint8Array', data: Array.from(value) };
+      }
+      return value;
+    });
   }
 }

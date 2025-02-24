@@ -46,8 +46,10 @@ export function ForzaContext(props: ForzaContextProps) {
     });
     const replaySub = ws.on('replay', (data) => {
       replayPacketRef.current = data;
+      packetRef.current = data;
     });
     const throttleInterval = setInterval(() => {
+      console.log(`Setting latest packet: ${packetRef.current?.data.timeStampMS}`);
       setLatestPacket(packetRef.current);
       if (packetRef.current && packetRef.current.data.isRaceOn) {
         console.log(`Adding packet to data window: ${slidingWindow.current.data.length}`);

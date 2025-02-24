@@ -178,8 +178,8 @@ export class ForzaWebsocket implements IForzaWebsocket {
           this.emit('data', { data: new ForzaTelemetryApi(liveBuffer.byteLength, liveBuffer.buffer) });
           break;
         case SocketTopics.Playback:
-          const replayBuffer = message.data as ArrayBuffer;
-          this.emit('replay', { data: new ForzaTelemetryApi(replayBuffer.byteLength, replayBuffer) });
+          const replayBuffer = message.data as Uint8Array;
+          this.emit('replay', { data: new ForzaTelemetryApi(replayBuffer.byteLength, replayBuffer.buffer) });
           break;
         default: 
           console.log(`Unknown message: ${JSON.stringify(message)}`);

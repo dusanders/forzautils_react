@@ -54,7 +54,7 @@ export class WebsocketServer implements IWebsocketServer {
       console.log(`Received playback request for ${request.filename}`);
       const replaySocket = new ReplayWebsocket(socket);
       replaySocket.replay(await this.recorder.playback(request.filename));
-    } else if(WebsocketRequestValidator.isSetRecordingRequest(request)) {
+    } else if (WebsocketRequestValidator.isSetRecordingRequest(request)) {
       this.recorder.setRecording(request.record);
     }
     else {
@@ -76,12 +76,9 @@ export class WebsocketServer implements IWebsocketServer {
     this.recorder.maybeWritePacket(bytes);
     this.wsApp.publish(
       SocketTopics.LiveData,
-      ByteEncoder.encode(JSON.stringify(message, (key, value) => {
-        if(value instanceof Uint8Array) {
-          return {type: 'Uint8Array', data: Array.from(value)};
-        }
-        return value;
-      })),
+      ByteEncoder.encode(
+        ByteEncoder.encodeBinaryMessage(message)
+      ),
       true
     );
   }
