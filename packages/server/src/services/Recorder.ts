@@ -13,7 +13,7 @@ export interface IRecordData {
   initialize(): Promise<void>;
   setRecording(state: boolean): void;
   getAllRecordings(): Promise<RecordedFile[]>;
-  playback(filename: string): IFileReader;
+  playback(filename: string): Promise<IFileReader>;
   maybeWritePacket(buffer: Buffer<ArrayBufferLike>): void;
 }
 
@@ -61,16 +61,18 @@ export class ForzaDataRecorder implements IRecordData {
 
   async getAllRecordings(): Promise<RecordedFile[]> {
     const dataDir = Path.resolve(this.config.parentDir);
-    const allFiles = await readdir(dataDir);
-    return allFiles.map<RecordedFile>((i) => {
-      return FilenameUtils.parseFilename(i);
-    });
+    const allFiles = await FilenameUtils.parseDir(dataDir);
+    return allFiles;
   }
 
-  playback(filename: string): IFileReader {
+  async playback(filename: string): Promise<IFileReader> {
     const fileInfo = FilenameUtils.parseFilename(filename);
+    console.log(`parsed playback info: ${JSON.stringify(fileInfo)}`);
+    if(!fileInfo) {
+      throw new Error(`Failed to parse filename ${filename}`);
+    }
     const reader = new FileReader(this.config);
-    reader.open(fileInfo);
+    await reader.open(fileInfo);
     return reader;
   }
 

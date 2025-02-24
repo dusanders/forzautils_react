@@ -48,11 +48,12 @@ export class WebsocketServer implements IWebsocketServer {
     }
   }
 
-  private handleIncomingMessage(socket: WebSocket<IWebsocketInfo>, data: ArrayBuffer) {
+  private async handleIncomingMessage(socket: WebSocket<IWebsocketInfo>, data: ArrayBuffer) {
     const request = JSON.parse(ByteEncoder.decode(data));
     if (WebsocketRequestValidator.isPlaybackRequest(request)) {
+      console.log(`Received playback request for ${request.filename}`);
       const replaySocket = new ReplayWebsocket(socket);
-      replaySocket.replay(this.recorder.playback(request.filename));
+      replaySocket.replay(await this.recorder.playback(request.filename));
     } else if(WebsocketRequestValidator.isSetRecordingRequest(request)) {
       this.recorder.setRecording(request.record);
     }

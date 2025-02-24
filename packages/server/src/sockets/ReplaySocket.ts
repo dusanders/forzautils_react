@@ -3,6 +3,7 @@ import { IFileReader } from "../services/FileReader.js";
 import { IWebsocketInfo } from "../types/WebsocketInfo.js";
 import { WebSocket } from 'uWebSockets.js';
 import { ByteEncoder } from "../utilities/ByteEncoder.js";
+import { Timers } from "../utilities/Timers.js";
 
 export class ReplayWebsocket {
   private ws: WebSocket<IWebsocketInfo>;
@@ -20,6 +21,7 @@ export class ReplayWebsocket {
       }
       this.ws.send(ByteEncoder.encode(JSON.stringify(message)));
       packet = await reader.getNextPacket();
+      await Timers.delay(1000 / 60); // 60 FPS
     }
   }
 }

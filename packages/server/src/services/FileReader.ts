@@ -17,13 +17,19 @@ export class FileReader implements IFileReader {
     this.parentDir = config.parentDir;
   }
   async open(info: RecordedFile): Promise<void> {
-    this.info = info;
-    const filepath = Path.resolve(this.parentDir, info.filename);
-    if(!FS.existsSync(filepath)) {
-      throw new Error(`Failed to open file ${filepath} -- does not exist`);
-    }
-    this.stream = FS.createReadStream(filepath);
-    this.stream.pause();
+    return new Promise<void>((resolve, reject) => {
+      this.info = info;
+      const filepath = Path.resolve(this.parentDir, info.filename);
+      if(!FS.existsSync(filepath)) {
+        reject(new Error(`Failed to open file ${filepath} -- does not exist`));
+      }
+      this.stream = FS.createReadStream(filepath);
+      console.log(`Opened file ${filepath} for reading`);
+      this.stream.on('readable', () => {
+        console.log(`File ${filepath} is readable`);
+        resolve();
+      });
+    });
   }
 
   async getNextPacket(): Promise<Buffer<ArrayBufferLike> | null> {
