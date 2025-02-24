@@ -1,11 +1,11 @@
-import React, { memo, useEffect, useReducer, useState } from "react";
+import React, { memo, useEffect, useMemo, useReducer, useState } from "react";
 import { ThemeText } from "../ThemeText";
 import { Utils } from "../../utility/Utils";
 import { useTheme } from "../../context/Theme";
 import { useScreenDimensions } from "../../hooks/useScreenDimensions";
-import { LineChart, LineSeriesType } from "@mui/x-charts";
 import { useForzaData } from "../../context/ForzaContext";
 import { StateHandler } from "../../utility/types";
+import { Line } from "react-chartjs-2";
 
 
 export interface GearData {
@@ -23,71 +23,89 @@ interface HpTqCurveProps {
   dataPoints: RpmDataPoint[];
 }
 
-const HpGraph = memo((props: HpTqCurveProps) => {
+function HpGraph(props: HpTqCurveProps) {
   const theme = useTheme();
-  const size = useScreenDimensions();
   const rpmPoints = props.dataPoints.map(i => i.rpm)
-  const hpSeries: LineSeriesType = {
-    type: 'line',
-    data: props.dataPoints.map(i => i.hp),
-    label: 'Horsepower',
-    id: 'hp',
-    showMark: false
-  };
-  const tqSeries: LineSeriesType = {
-    type: 'line',
-    data: props.dataPoints.map(i => i.tq),
-    label: 'Torque',
-    id: 'tq',
-    showMark: false
-  }
+  
   return (
-    <LineChart
-      height={300}
-      width={Utils.getGraphWidth(size.dimensions.innerWidth)}
-      xAxis={[{
-        data: rpmPoints,
-      }]}
-      axisHighlight={{ x: 'none', y: 'none' }}
-      series={[hpSeries, tqSeries]}
-      title="Horsepower"
-      sx={{
-        backgroundColor: theme.colors.charts.line.background,
-        borderRadius: 2,
-        '& .MuiChartsLegend-root': {
-          '& .MuiChartsLegend-series': {
-            'text': {
-              fill: `${theme.colors.charts.line.valueLabel} !important`
-            }
-          }
+    <Line
+    style={{
+      backgroundColor: theme.colors.charts.line.background,
+      borderRadius: 6,
+      width: '100%',
+    }}
+    options={{
+      maintainAspectRatio: false,
+      responsive: true,
+      spanGaps: true,
+      elements: {
+        point: {
+          pointStyle: false,
+          radius: 0
         },
-        '& .MuiChartsAxis-root': {
-          '& .MuiChartsAxis-line': {
-            stroke: theme.colors.charts.line.axisLine
+        line: {
+          tension: 0.3
+        }
+      },
+      scales: {
+        y: {
+          ticks: {
+            color: theme.colors.charts.line.valueLabel
           },
-          '& .MuiChartsAxis-tickContainer': {
-            '& .MuiChartsAxis-tickLabel': {
-              fill: theme.colors.charts.line.valueLabel
-            },
-            '& .MuiChartsAxis-tick': {
-              stroke: theme.colors.charts.line.tick
-            },
+          grid: {
+            display: false
           }
         }
-      }} />
+      },
+      plugins: {
+        tooltip: {
+          enabled: false
+        },
+        legend: {
+          labels: {
+            boxWidth: 8,
+            boxHeight: 8,
+            useBorderRadius: true,
+            borderRadius: 2,
+            color: theme.colors.charts.line.valueLabel,
+            font: {
+              size: 12
+            }
+          }
+        }
+      }
+    }}
+    data={{
+      labels: rpmPoints,
+      datasets: [
+        {
+          label: 'Horsepower',
+          data: props.dataPoints.map(i => i.hp),
+          borderColor: theme.colors.charts.leftFrontColor,
+          backgroundColor: theme.colors.charts.leftFrontColor,
+        },
+        {
+          label: 'Torque',
+          data: props.dataPoints.map(i => i.tq),
+          borderColor: theme.colors.charts.rightFrontColor,
+          backgroundColor: theme.colors.charts.rightFrontColor,
+        }
+      ]
+    }} />
   )
-});
+}
 
 interface TabItemProps {
   label: string;
   index: number;
+  isSelected: boolean;
   onClick: (index: number) => void;
 }
 function TabItem(props: TabItemProps) {
   const theme = useTheme();
   return (
     <li key={Utils.randomKey()}
-      className={`me-2 p-2 ${theme.colors.background.tabs.hover} ${props.index === 0
+      className={`me-2 p-2 ${theme.colors.background.tabs.hover} ${props.isSelected
         ? theme.colors.background.tabs.indicator
         : theme.colors.background.tabs.background
         } rounded-b-sm cursor-pointer`}
@@ -124,19 +142,16 @@ function findOrCreateGearData(gear: number, allGears: GearData[]) {
     if (!currentGearData) {
       throw new Error(`Failed to create gear data for gear ${gear}`); // This should never happen
     }
-    // Add a new data point
-    currentGearData.dataPoints.push({
-      rpm: 0,
-      hp: 0,
-      tq: 0
-    });
   }
   return currentGearData;
 }
-function addOrUpdateDataPoint(rpm: number, gear: number, hp: number, tq: number, allGears: GearData[]) {
+function addOrUpdateDataPoint(rpm: number, gear: number, hp: number, tq: number, allGears: GearData[]): boolean {
+  if(hp < 0) {
+    return false;
+  }
   let currentGearData = findOrCreateGearData(gear, allGears);
-  if(!isRpmStep(roundedRpm(rpm)) || isDecel(rpm, currentGearData!)) {
-    return [...allGears];
+  if (!isRpmStep(roundedRpm(rpm)) || isDecel(rpm, currentGearData!)) {
+    return false;
   }
   const found = currentGearData!.dataPoints.find((i) => i.rpm === roundedRpm(rpm));
   if (found) {
@@ -154,7 +169,7 @@ function addOrUpdateDataPoint(rpm: number, gear: number, hp: number, tq: number,
       tq: tq
     });
   }
-  return [...allGears];
+  return true;
 }
 
 const debugData = [
@@ -229,49 +244,56 @@ const initialState: HpTqCollectionState = {
 export function HpTqCollection(props: HpTqCollectionProps) {
   const theme = useTheme();
   const forza = useForzaData();
+  const size = useScreenDimensions();
+  const width = Utils.getGraphWidth(size.dimensions.innerWidth);
   const [state, setState] = useReducer<StateHandler<HpTqCollectionState>>((prev, next) => {
     return { ...prev, ...next };
   }, initialState);
   const [activeTab, setActiveTab] = useState(0);
   const [activeChart, setActiveChart] = useState<GearData>(state.gears[0]);
+  const tabs = useMemo(() => {
+    return state.gears.sort((a,b) => {return a.gear - b.gear}).map((i, index) => (
+      <TabItem
+        isSelected={index === activeTab}
+        key={Utils.randomKey()}
+        label={`Gear ${i.gear}`}
+        index={index}
+        onClick={(index) => {
+          setActiveTab(index);
+        }} />
+    )
+    )
+  }, [state.gears, activeTab]);
 
   useEffect(() => {
     setActiveChart(state.gears[activeTab]);
   }, [activeTab]);
 
   useEffect(() => {
-    if(forza.packet && forza.packet.data.isRaceOn) {
-      setState({
-        gears: addOrUpdateDataPoint(
-          forza.packet.data.rpmData.current,
-          forza.packet.data.gear,
-          forza.packet.data.getHorsepower(),
-          forza.packet.data.torque,
-          state.gears
-        )
-      });
+    if (forza.packet && forza.packet.data.isRaceOn && (forza.packet.data.gear !== 11 && forza.packet.data.gear !== 0)) {
+      const didUpdate = addOrUpdateDataPoint(
+        forza.packet.data.rpmData.current,
+        forza.packet.data.gear,
+        forza.packet.data.getHorsepower(),
+        forza.packet.data.torque,
+        state.gears
+      );
+      if (didUpdate) {
+        setState({ gears: [...state.gears] });
+      }
     }
   }, [forza.packet]);
 
   return (
-    <div>
+    <div className="w-full flex flex-col" style={{
+      width: width,
+    }}>
       <div className={`flex w-full min-h-8 rounded-t-lg`}>
         <HpGraph
           dataPoints={activeChart.dataPoints} />
       </div>
       <ul className="flex flex-wrap me-2 ms-2">
-        {state.gears.map((i, index) => {
-          return (
-            <TabItem
-              key={Utils.randomKey()}
-              label={`Gear ${i.gear}`}
-              index={index}
-              onClick={(index) => {
-                setActiveTab(index);
-              }} />
-          );
-        })
-        }
+        {tabs}
       </ul>
     </div>
   )

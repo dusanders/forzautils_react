@@ -109,11 +109,6 @@ export function TrackMap(props: TrackMapProps) {
         className={`${theme.colors.background.trackMap} rounded-lg`}
         preserveAspectRatio="xMidYMid meet"
         viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.maxX} ${viewBox.maxY}`}>
-        {/* <text fontSize={fontSize}
-          fill={theme.colors.charts.line.valueLabel}
-          x={viewBox.minX} y={viewBox.minY + fontSize}>
-          Lap: {raceInfo.currentLap} Pos: {raceInfo.currentPosition}
-        </text> */}
         <path stroke={theme.colors.charts.line.axisLine}
           strokeWidth={fontSize * 0.3}
           strokeLinecap={'round'} fill="rgba(0,0,0,0)"
@@ -132,7 +127,7 @@ export function TrackMap(props: TrackMapProps) {
           Position: {raceInfo.currentPosition}
         </ThemeText>
         <ThemeText className="text-2xl">
-          Race Time: {raceInfo.time}
+          Race Time: {raceInfo.time.toFixed(3)}
         </ThemeText>
       </div>
     </div>

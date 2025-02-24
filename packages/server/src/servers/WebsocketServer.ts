@@ -53,7 +53,8 @@ export class WebsocketServer implements IWebsocketServer {
     if (WebsocketRequestValidator.isPlaybackRequest(request)) {
       console.log(`Received playback request for ${request.filename}`);
       const replaySocket = new ReplayWebsocket(socket);
-      replaySocket.replay(await this.recorder.playback(request.filename));
+      const player = await this.recorder.playback(request.filename);
+      replaySocket.replay(player);
     } else if (WebsocketRequestValidator.isSetRecordingRequest(request)) {
       this.recorder.setRecording(request.record);
     }

@@ -40,8 +40,6 @@ export function Suspension(props: SuspensionProps) {
       return;
     }
 
-    console.log(`new sus len ${state.leftFront.data.length}`);
-
     setState({
       leftFront: state.leftFront.push(
         forza.packet.data.normalizedSuspensionTravel.leftFront

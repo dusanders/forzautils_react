@@ -21,7 +21,7 @@ export function ForzaContext(props: ForzaContextProps) {
   const ws = ForzaWebsocket.Open();
   const packetRef = useRef<ForzaDataEvent>();
   const replayPacketRef = useRef<ForzaDataEvent>();
-  const slidingWindow = useRef<LimitedArray<ForzaDataEvent>>(new LimitedArray(10, []));
+  const slidingWindow = useRef<LimitedArray<ForzaDataEvent>>(new LimitedArray(20, []));
   const [isWSOpen, setIsWSOpen] = useState(false);
   const [replay, setReplay] = useState<ForzaDataEvent | undefined>();
   const [latestPacket, setLatestPacket] = useReducer<StateHandler<ForzaDataEvent | undefined>>((prev, next) => {
@@ -50,6 +50,10 @@ export function ForzaContext(props: ForzaContextProps) {
     });
     const throttleInterval = setInterval(() => {
       console.log(`Setting latest packet: ${packetRef.current?.data.timeStampMS}`);
+      if(packetRef.current?.data.timeStampMS === latestPacket?.data.timeStampMS) {  
+        // If the packet is the same as the last one, don't update 
+        return;
+      }
       setLatestPacket(packetRef.current);
       if (packetRef.current && packetRef.current.data.isRaceOn) {
         console.log(`Adding packet to data window: ${slidingWindow.current.data.length}`);

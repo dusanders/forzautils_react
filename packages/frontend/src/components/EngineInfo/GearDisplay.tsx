@@ -32,7 +32,7 @@ export function GearDisplay(props: GearDisplayProps) {
   }, initialState);
 
   useEffect(() => {
-    if (!forza.packet || !forza.packet.data.isRaceOn) {
+    if (!forza.packet || !forza.packet.data.isRaceOn || forza.packet.data.gear === 11) {
       return;
     }
     setState({
@@ -55,7 +55,7 @@ export function GearDisplay(props: GearDisplayProps) {
       <div className="flex mb-4 justify-evenly">
         <LabeledGauge
           label="RPM"
-          value={state.currentRpm}
+          value={Math.round(state.currentRpm)}
           min={state.minRpm}
           max={state.maxRpm} />
         <div className="flex flex-col content-center justify-center">
@@ -68,7 +68,7 @@ export function GearDisplay(props: GearDisplayProps) {
         </div>
         <LabeledGauge
           label="Throttle"
-          value={state.throttle}
+          value={Math.round(state.throttle)}
           min={0}
           max={100} />
       </div>
