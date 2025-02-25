@@ -49,14 +49,12 @@ export function ForzaContext(props: ForzaContextProps) {
       packetRef.current = data;
     });
     const throttleInterval = setInterval(() => {
-      console.log(`Setting latest packet: ${packetRef.current?.data.timeStampMS}`);
       if(packetRef.current?.data.timeStampMS === latestPacket?.data.timeStampMS) {  
         // If the packet is the same as the last one, don't update 
         return;
       }
       setLatestPacket(packetRef.current);
       if (packetRef.current && packetRef.current.data.isRaceOn) {
-        console.log(`Adding packet to data window: ${slidingWindow.current.data.length}`);
         slidingWindow.current = slidingWindow.current.push(packetRef.current);
       }
     }, 100);
