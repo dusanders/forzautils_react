@@ -236,9 +236,11 @@ export interface HpTqCollectionProps {
   // Nothing here
 }
 interface HpTqCollectionState {
+  trackId: number;
   gears: GearData[];
 }
 const initialState: HpTqCollectionState = {
+  trackId: 0,
   gears: debugData
 }
 export function HpTqCollection(props: HpTqCollectionProps) {
@@ -271,6 +273,13 @@ export function HpTqCollection(props: HpTqCollectionProps) {
 
   useEffect(() => {
     if (forza.packet && forza.packet.data.isRaceOn && (forza.packet.data.gear !== 11 && forza.packet.data.gear !== 0)) {
+      if(forza.packet.data.trackId !== state.trackId){
+        setState({ gears: [] });
+        setActiveTab(0);
+        setActiveChart(state.gears[0]);
+        setState({ trackId: forza.packet.data.trackId });
+        return;
+      }
       const didUpdate = addOrUpdateDataPoint(
         forza.packet.data.rpmData.current,
         forza.packet.data.gear,
