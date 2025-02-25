@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { Card } from "./Card";
 import { Paper } from "./Paper";
 import { ThemeText } from './ThemeText';
@@ -9,6 +9,7 @@ import { Utils } from "../utility/Utils";
 import { useForzaData } from "../context/ForzaContext";
 import { FM8_CarInfo } from "@forzautils/core";
 import { FM8_trackList } from "ForzaTelemetryApi";
+import { StateHandler } from "../utility/types";
 
 export interface TrackMapProps {
 
@@ -30,74 +31,89 @@ interface RaceInfo {
   trackId: number;
   time: number;
 }
+interface TrackMapState {
+  svgPath: string;
+  positionArray: PlayerPosition[];
+  viewBox: ViewBoxState;
+  playerPosition: PlayerPosition;
+  raceInfo: RaceInfo;
+}
+
+const initialState: TrackMapState = {
+  svgPath: '',
+  positionArray: [],
+  viewBox: {
+    minX: -10,
+    minY: -10,
+    maxX: 20,
+    maxY: 20
+  },
+  playerPosition: {
+    x: 0,
+    y: 0
+  },
+  raceInfo: {
+    currentLap: 0,
+    currentPosition: 0,
+    trackId: 0,
+    time: 0
+  }
+}
+
 export function TrackMap(props: TrackMapProps) {
   const xPadding: number = 10;
   const yPadding: number = 10;
   const theme = useTheme();
   const screen = useScreenDimensions();
   const forza = useForzaData();
-  const [path, setPath] = useState('');
-  const [raceInfo, setRaceInfo] = useState<RaceInfo>({ currentLap: 0, currentPosition: 0, trackId: 111, time: 0 });
-  const [positions, setPositions] = useState<PlayerPosition[]>([{ x: 0, y: 0 }]);
-  const [viewBox, setViewBox] = useState<ViewBoxState>({
-    minX: -10,
-    minY: -10,
-    maxX: 20,
-    maxY: 20
-  });
 
-  const maybeUpdateViewBox = (newViewBox: ViewBoxState) => {
-    if (newViewBox.maxX < 0) {
-      newViewBox.maxX = (Math.abs(newViewBox.maxX) - Math.abs(newViewBox.minX)) * 2.3;
+  const [state, setState] = useReducer<StateHandler<TrackMapState>>((state, newState) => {
+    if (newState.raceInfo?.trackId && state.raceInfo.trackId !== newState.raceInfo?.trackId) {
+      const resetState = initialState;
+      resetState.raceInfo = newState.raceInfo;
+      return resetState;
     }
-    if (newViewBox.maxY < 0) {
-      newViewBox.maxY = (Math.abs(newViewBox.maxY) - Math.abs(newViewBox.minY)) * 2.3;
+    if (newState.playerPosition) {
+      newState.positionArray = [...state.positionArray, newState.playerPosition];
+      newState.svgPath = newState.positionArray.reduce((svgPath, pos, index) => {
+        if (index === 0) {
+          return `M${pos.x} ${pos.y}`;
+        } else if (index === 1) {
+          return `${svgPath} L${pos.x} ${pos.y}`;
+        } else {
+          return `${svgPath} L${pos.x} ${pos.y}`;
+        }
+      }, '');
+      newState.viewBox = {
+        maxX: (Math.max(...newState.positionArray.map((i) => Math.abs(i.x))) + xPadding) * 2,
+        maxY: (Math.max(...newState.positionArray.map((i) => Math.abs(i.y))) + yPadding) * 2,
+        minX: (Math.min(...newState.positionArray.map((i) => i.x)) - xPadding),
+        minY: (Math.min(...newState.positionArray.map((i) => i.y)) - yPadding)
+      };
     }
-    newViewBox.maxX = Math.abs(newViewBox.minX) * 2.01;
-    newViewBox.maxY = Math.abs(newViewBox.minY) * 2.2;
-    if (newViewBox.maxX !== viewBox.maxX || newViewBox.maxY !== viewBox.maxY
-      || newViewBox.minX !== viewBox.minX || newViewBox.minY !== viewBox.minY) {
-      return newViewBox;
-    }
-    return viewBox;
-  }
+    return { ...state, ...newState }
+  }, initialState);
 
   useEffect(() => {
     if (!forza.packet || !forza.packet.data.isRaceOn) {
       return;
     }
-    const newPosition: PlayerPosition = {
-      x: forza.packet.data.position.x,
-      y: forza.packet.data.position.z
-    };
-    if (positions.length === 1 && positions[0].x === 0 && positions[0].y === 0) {
-      setPath(`M${newPosition.x} ${newPosition.y}`);
-      positions[0] = newPosition;
-    } else {
-      setPath(`${path} ${positions.length < 2 ? 'L' : ''}${newPosition.x} ${newPosition.y}`);
-    }
-    const updatedHistory = [...positions, newPosition];
-    const xPosHistory = updatedHistory.map((i) => i.x);
-    const yPosHistory = updatedHistory.map((i) => i.y);
-    setViewBox(
-      maybeUpdateViewBox({
-        maxX: (Math.max(...xPosHistory) + xPadding),
-        maxY: (Math.max(...yPosHistory) + yPadding),
-        minX: (Math.min(...xPosHistory) - xPadding),
-        minY: (Math.min(...yPosHistory) - yPadding)
-      })
-    );
-    setPositions(updatedHistory);
-    setRaceInfo({
-      currentLap: forza.packet.data.lapNumber,
-      currentPosition: forza.packet.data.racePosition,
-      trackId: forza.packet.data.trackId,
-      time: forza.packet.data.currentRaceTime
-    });
+    setState({
+      raceInfo: {
+        currentLap: forza.packet.data.lapNumber,
+        currentPosition: forza.packet.data.racePosition,
+        trackId: forza.packet.data.trackId,
+        time: forza.packet.data.currentRaceTime
+      },
+      playerPosition: {
+        x: forza.packet.data.position.x / 100,
+        y: forza.packet.data.position.z / 100
+      }
+    })
   }, [forza.packet]);
 
-  const trackInfo = FM8_trackList.getTrackInfo(raceInfo.trackId);
-  const fontSize = (Math.max(viewBox.maxY), Math.abs(viewBox.minY)) * 0.1;
+  const trackInfo = FM8_trackList.getTrackInfo(state.raceInfo.trackId);
+  const fontSize = (Math.max(state.viewBox.maxY), Math.abs(state.viewBox.minY)) * 0.1;
   return (
     <div
       className='place-items-center flex flex-col relative'>
@@ -108,26 +124,26 @@ export function TrackMap(props: TrackMapProps) {
         width={Utils.getGraphWidth(screen.dimensions.innerWidth)}
         className={`${theme.colors.background.trackMap} rounded-lg`}
         preserveAspectRatio="xMidYMid meet"
-        viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.maxX} ${viewBox.maxY}`}>
+        viewBox={`${state.viewBox.minX} ${state.viewBox.minY} ${state.viewBox.maxX} ${state.viewBox.maxY}`}>
         <path stroke={theme.colors.charts.line.axisLine}
           strokeWidth={fontSize * 0.3}
           strokeLinecap={'round'} fill="rgba(0,0,0,0)"
-          d={path} />
+          d={state.svgPath} />
         <circle
-          cx={positions[positions.length - 1].x}
-          cy={positions[positions.length - 1].y}
+          cx={state.playerPosition.x}
+          cy={state.playerPosition.y}
           r={fontSize * 0.5}
           fill={theme.colors.charts.line.indicator} />
       </svg>
       <div className="flex flex-col h-full w-full absolute">
         <ThemeText className="text-2xl">
-          Lap: {raceInfo.currentLap}
+          Lap: {state.raceInfo.currentLap + 1}
         </ThemeText>
         <ThemeText className="text-2xl">
-          Position: {raceInfo.currentPosition}
+          Position: {state.raceInfo.currentPosition}
         </ThemeText>
         <ThemeText className="text-2xl">
-          Race Time: {raceInfo.time.toFixed(3)}
+          Race Time: {state.raceInfo.time.toFixed(3)}
         </ThemeText>
       </div>
     </div>
