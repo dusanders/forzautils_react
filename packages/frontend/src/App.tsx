@@ -12,6 +12,7 @@ import { Paper } from './components/Paper';
 import { Card } from './components/Card';
 import { CardTitle } from './components/CardTitle';
 import { CarCornerInfo } from './components/CarCornerInfo';
+import { FM8_trackList } from 'ForzaTelemetryApi';
 
 function App() {
   const recorder = useRecorder();
@@ -39,7 +40,7 @@ function App() {
           <Paper>
             {recorder.allFiles.map((file, index) => (
               <Card 
-              title={<CardTitle title={`File: ${file.filename}`} />} 
+              title={<CardTitle title={`File: ${FM8_trackList.getTrackInfo(file.trackId)?.circuit} - ${new Date(file.date).toLocaleDateString()}`} />} 
               rootClassName='mb-4'
               key={index}
               body={
@@ -51,7 +52,7 @@ function App() {
                     }
                   )
                 }}>
-                  <div>Time: {file.date}</div>
+                  <div>Time: {new Date(file.date).toLocaleDateString()}</div>
                   <div>Packet Length: {file.packetLen}</div>
                   <div>Track: {file.trackId}</div>
                 </div>
